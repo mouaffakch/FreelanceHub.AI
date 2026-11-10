@@ -1,0 +1,433 @@
+<app-navbar></app-navbar>
+
+<div class="container py-4 fade-up" style="max-width: 1040px;">
+
+  <!-- Barre de navigation supérieure (si consultation du profil par un client ou tiers) -->
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2" *ngIf="!isOwnProfile && user">
+    <button class="btn btn-outline-primary btn-sm px-3 py-2 d-inline-flex align-items-center gap-2" (click)="goBack()">
+      <i class="bi bi-arrow-left"></i>
+      <span>Retour aux candidatures</span>
+    </button>
+
+    <div class="d-flex align-items-center gap-2">
+      <span class="badge-ai py-1 px-3">
+        <i class="bi bi-shield-check text-info me-1"></i> Profil Public Vérifié
+      </span>
+      <a [routerLink]="['/chat', user.id]" class="btn btn-outline-info btn-sm px-3 py-2 d-inline-flex align-items-center gap-2">
+        <i class="bi bi-chat-dots-fill"></i>
+        <span>Envoyer un message</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-info" role="status" style="width: 3rem; height: 3rem;"></div>
+    <p class="text-subtle mt-3 small">Chargement du profil sécurisé et des réalisations...</p>
+  </div>
+
+  <!-- Messages Flash -->
+  <div *ngIf="error" class="alert alert-danger border-0 rounded-4 shadow-sm mb-4 d-flex align-items-center">
+    <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+    <span>{{ error }}</span>
+  </div>
+  <div *ngIf="successMsg" class="alert alert-success border-0 rounded-4 shadow-sm mb-4 d-flex align-items-center">
+    <i class="bi bi-check-circle-fill me-2 fs-5"></i>
+    <span>{{ successMsg }}</span>
+  </div>
+
+  <div *ngIf="!loading && user">
+
+    <!-- ==================== HERO PROFILE BANNER ==================== -->
+    <div class="profile-hero-card premium-card p-4 p-md-5 mb-4 position-relative overflow-hidden">
+      <div class="card-glow-bar"></div>
+
+      <div class="d-flex flex-column flex-md-row align-items-center align-items-md-start gap-4">
+        
+        <!-- 3D Holographic Avatar Ring -->
+        <div class="avatar-holo-large flex-shrink-0">
+          <div class="avatar-large-inner">
+            {{ getInitial() }}
+          </div>
+        </div>
+
+        <!-- Info Header -->
+        <div class="flex-grow-1 text-center text-md-start">
+          <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-start gap-2 mb-1">
+            <h2 class="brand-font fw-extrabold text-white mb-0 fs-2">
+              {{ user.firstname }} {{ user.lastname }}
+            </h2>
+            <span class="badge-status-pill"
+                  [class.status-open]="user.status === 'ACTIVE'"
+                  [class.status-closed]="user.status === 'SUSPENDED'"
+                  [class.status-progress]="user.status === 'PENDING'">
+              <span class="status-dot"></span>
+              {{ user.status === 'ACTIVE' ? 'DISPONIBLE' : user.status }}
+            </span>
+          </div>
+
+          <p class="text-subtle small mb-3 font-monospace">
+            <i class="bi bi-envelope-at me-1 text-info"></i> {{ user.email }}
+          </p>
+
+          <div class="d-flex flex-wrap justify-content-center justify-content-md-start gap-2 align-items-center">
+            <span class="badge-ai">
+              <span class="pulse-dot"></span>
+              {{ getRoleLabel() }}
+            </span>
+
+            <!-- Badge Stars & Avis -->
+            <div class="rating-badge-glow d-inline-flex align-items-center gap-1 px-3 py-1 rounded-pill">
+              <i class="bi bi-star-fill text-warning"></i>
+              <strong class="text-white">{{ averageRating > 0 ? (averageRating | number:'1.1-1') : '5.0' }} / 5</strong>
+              <span class="text-subtle small ms-1">({{ reviews.length }} avis certifiés)</span>
+            </div>
+
+            <!-- Projets Réalisés Badge -->
+            <div class="projects-badge d-inline-flex align-items-center gap-1 px-3 py-1 rounded-pill">
+              <i class="bi bi-check2-circle text-success"></i>
+              <strong class="text-white">{{ completedCount }} projets réalisés</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action CTAs -->
+        <div class="flex-shrink-0 text-center text-md-end mt-2 mt-md-0">
+          <!-- Si c'est son propre profil : Éditer -->
+          <button *ngIf="isOwnProfile" class="btn btn-outline-primary px-4 py-2" (click)="toggleEdit()">
+            <i class="bi" [class.bi-pencil-square]="!editMode" [class.bi-x-lg]="editMode"></i>
+            <span class="ms-1">{{ editMode ? 'Fermer l\'édition' : 'Éditer mon profil' }}</span>
+          </button>
+
+          <!-- Si c'est un client qui consulte ce freelance : Contacter -->
+          <a *ngIf="!isOwnProfile" [routerLink]="['/chat', user.id]" class="btn-ai-glow px-4 py-2 text-decoration-none d-inline-flex align-items-center gap-2">
+            <i class="bi bi-chat-text-fill"></i>
+            <span>Discuter avec {{ user.firstname }}</span>
+          </a>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ==================== KPI STATS ROW (PROJETS, ÉTOILES, VOLUME, FIABILITÉ) ==================== -->
+    <div class="row g-3 mb-4">
+      
+      <!-- KPI 1 : Projets Réalisés -->
+      <div class="col-6 col-md-3">
+        <div class="kpi-metric-card p-3 p-md-4 rounded-4 text-center">
+          <div class="kpi-icon-box text-cyan mb-2 mx-auto">
+            <i class="bi bi-briefcase-fill fs-4"></i>
+          </div>
+          <h3 class="kpi-metric-num mb-0">{{ completedCount }}</h3>
+          <p class="kpi-metric-label mb-0">Projets Réalisés</p>
+          <small class="kpi-metric-sub">100% Livrés à temps</small>
+        </div>
+      </div>
+
+      <!-- KPI 2 : Évaluation & Étoiles -->
+      <div class="col-6 col-md-3">
+        <div class="kpi-metric-card p-3 p-md-4 rounded-4 text-center">
+          <div class="kpi-icon-box text-amber mb-2 mx-auto">
+            <i class="bi bi-star-fill fs-4"></i>
+          </div>
+          <h3 class="kpi-metric-num mb-0 text-warning">{{ averageRating > 0 ? (averageRating | number:'1.1-1') : '5.0' }}</h3>
+          <p class="kpi-metric-label mb-0">Note Globale</p>
+          <small class="kpi-metric-sub">
+            <i class="bi bi-star-fill text-warning me-1" *ngFor="let s of getStars(averageRating || 5)"></i>
+          </small>
+        </div>
+      </div>
+
+      <!-- KPI 3 : Avis Clients Reçus -->
+      <div class="col-6 col-md-3">
+        <div class="kpi-metric-card p-3 p-md-4 rounded-4 text-center">
+          <div class="kpi-icon-box text-violet mb-2 mx-auto">
+            <i class="bi bi-chat-quote-fill fs-4"></i>
+          </div>
+          <h3 class="kpi-metric-num mb-0">{{ reviews.length }}</h3>
+          <p class="kpi-metric-label mb-0">Avis Clients</p>
+          <small class="kpi-metric-sub">Évaluations certifiées</small>
+        </div>
+      </div>
+
+      <!-- KPI 4 : Volume Livré Sécurisé -->
+      <div class="col-6 col-md-3">
+        <div class="kpi-metric-card p-3 p-md-4 rounded-4 text-center">
+          <div class="kpi-icon-box text-emerald mb-2 mx-auto">
+            <i class="bi bi-shield-lock-fill fs-4"></i>
+          </div>
+          <h3 class="kpi-metric-num mb-0 text-success">{{ totalDeliveredVolume | currency:'EUR':'symbol':'1.0-0' }}</h3>
+          <p class="kpi-metric-label mb-0">Volume d'Affaires</p>
+          <small class="kpi-metric-sub">Garantie Escrow Stripe</small>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ==================== COMPÉTENCES & STACK TECHNIQUE ==================== -->
+    <div class="premium-card p-4 p-md-5 mb-4" *ngIf="user.skills && user.skills.length > 0">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="brand-font fw-bold text-white mb-0 fs-5">
+          <i class="bi bi-code-slash text-cyan me-2"></i> Compétences & Technologies Maîtrisées
+        </h4>
+        <span class="count-pill py-1 px-3" style="font-size: 0.72rem;">{{ user.skills.length }} Compétences</span>
+      </div>
+
+      <div class="d-flex flex-wrap gap-2 pt-2">
+        <span *ngFor="let skill of user.skills" class="skill-tag-neon py-2 px-3 rounded-pill">
+          <i class="bi bi-check2 text-info me-1"></i> {{ skill }}
+        </span>
+      </div>
+    </div>
+
+    <!-- ==================== BIO & PRÉSENTATION ==================== -->
+    <div class="premium-card p-4 p-md-5 mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="brand-font fw-bold text-white mb-0 fs-5">
+          <i class="bi bi-file-earmark-person-fill text-cyan me-2"></i> Bio & Présentation Professionnelle
+        </h4>
+        <span class="badge-ai py-0 px-2" style="font-size: 0.65rem;" *ngIf="editMode">Mode Édition</span>
+      </div>
+
+      <!-- Mode Lecture -->
+      <div *ngIf="!editMode">
+        <div class="bio-display-box p-4 rounded-4" *ngIf="user.bio">
+          {{ user.bio }}
+        </div>
+        <div class="empty-box p-4 text-center rounded-4" *ngIf="!user.bio">
+          <p class="text-subtle small fst-italic mb-2">Aucune biographie renseignée.</p>
+          <button *ngIf="isOwnProfile" class="btn btn-outline-primary btn-sm" (click)="toggleEdit()">
+            <i class="bi bi-plus-lg me-1"></i> Rédiger ma bio
+          </button>
+        </div>
+      </div>
+
+      <!-- Mode Édition (Seulement propriétaire) -->
+      <div *ngIf="editMode && isOwnProfile">
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <label class="form-label text-light fw-bold small mb-1">Prénom</label>
+            <input class="form-control input-premium" [(ngModel)]="editFirstname" placeholder="Prénom">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label text-light fw-bold small mb-1">Nom</label>
+            <input class="form-control input-premium" [(ngModel)]="editLastname" placeholder="Nom">
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <label class="form-label text-light fw-bold small mb-0">Description Bio</label>
+            <span class="text-subtle small" style="font-size: 0.75rem;">Optimisable par IA</span>
+          </div>
+          <textarea class="form-control input-premium font-monospace-custom" rows="6" [(ngModel)]="editBio"
+                    placeholder="Présentez votre expertise, vos compétences clés et votre valeur ajoutée..."></textarea>
+        </div>
+
+        <!-- AI Preview Box if generated -->
+        <div *ngIf="showEnhancedPreview" class="enhanced-preview-box p-3 rounded-4 mb-3 border">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="badge-ai"><i class="bi bi-stars"></i> Proposition Rédigée par l'IA</span>
+            <button class="btn btn-sm btn-success text-white fw-bold py-1 px-3" (click)="applyEnhancedBio()">
+              <i class="bi bi-check2 me-1"></i> Adopter cette version
+            </button>
+          </div>
+          <p class="enhanced-text mb-0 small">{{ enhancedBio }}</p>
+        </div>
+
+        <!-- Actions -->
+        <div class="d-flex flex-wrap gap-2 pt-2">
+          <button class="btn-ai-glow btn-sm" (click)="enhanceBio()" [disabled]="enhancing">
+            <span *ngIf="enhancing" class="spinner-border spinner-border-sm me-1"></span>
+            <i *ngIf="!enhancing" class="bi bi-magic me-1"></i>
+            {{ enhancing ? 'Optimisation en cours...' : '✨ Améliorer avec l\'IA' }}
+          </button>
+
+          <button class="btn btn-outline-primary btn-sm px-4 ms-auto" (click)="saveProfile()" [disabled]="saving">
+            <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>
+            <i *ngIf="!saving" class="bi bi-check2-circle me-1"></i>
+            {{ saving ? 'Enregistrement...' : 'Sauvegarder les modifications' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== SECTION 1 : PROJETS RÉALISÉS & PORTFOLIO DE MISSIONS ==================== -->
+    <div class="premium-card p-4 p-md-5 mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+          <h4 class="brand-font fw-bold text-white mb-0 fs-5">
+            <i class="bi bi-kanban text-cyan me-2"></i> Projets Réalisés & Missions Complétées
+          </h4>
+          <p class="text-subtle small mb-0">
+            Historique certifié des projets livrés par ce freelance sur la plateforme.
+          </p>
+        </div>
+        <span class="count-pill py-1 px-3" style="font-size: 0.75rem;">
+          {{ completedProjects.length }} projet{{ completedProjects.length > 1 ? 's' : '' }}
+        </span>
+      </div>
+
+      <!-- Loading Projets -->
+      <div *ngIf="loadingProjects" class="text-center py-4">
+        <div class="spinner-border spinner-border-sm text-info" role="status"></div>
+        <p class="text-subtle small mt-2">Chargement de l'historique des projets...</p>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="!loadingProjects && completedProjects.length === 0" class="empty-box p-4 text-center rounded-4">
+        <i class="bi bi-folder2-open text-subtle fs-2 mb-2 d-block"></i>
+        <h6 class="text-white fw-bold mb-1">Aucun projet clôturé pour le moment</h6>
+        <p class="text-subtle small mb-0">Les projets attribués et complétés par ce freelance apparaîtront automatiquement ici.</p>
+      </div>
+
+      <!-- Liste des projets réalisés -->
+      <div class="d-flex flex-column gap-3" *ngIf="!loadingProjects && completedProjects.length > 0">
+        <div *ngFor="let p of completedProjects" class="project-item-card p-4 rounded-4 border position-relative">
+          
+          <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
+            <div>
+              <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge-status-pill py-0 px-2" style="font-size: 0.65rem;"
+                      [class.status-open]="p.status === 'OPEN'"
+                      [class.status-progress]="p.status === 'IN_PROGRESS'"
+                      [class.status-closed]="p.status === 'CLOSED'">
+                  {{ p.status === 'CLOSED' ? '✅ MISSION CLÔTURÉE' : p.status }}
+                </span>
+                <span class="text-muted small" *ngIf="p.createdAt" style="font-size: 0.75rem;">
+                  <i class="bi bi-calendar3 me-1"></i>{{ p.createdAt | date:'MMM yyyy' }}
+                </span>
+              </div>
+              <h5 class="fw-bold text-white mb-1">{{ p.title }}</h5>
+            </div>
+
+            <!-- Budget Badge -->
+            <div class="budget-badge-glow py-1 px-3 rounded-pill text-end">
+              <span class="small text-muted me-1">Budget:</span>
+              <strong class="text-success fs-6">{{ p.budget | currency:'EUR':'symbol':'1.0-0' }}</strong>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <p class="text-subtle small mb-3" style="line-height: 1.6;">
+            {{ p.description }}
+          </p>
+
+          <!-- Skills tags -->
+          <div class="d-flex flex-wrap gap-1 mb-3" *ngIf="p.requiredSkills && p.requiredSkills.length > 0">
+            <span *ngFor="let sk of p.requiredSkills" class="badge bg-dark text-info border border-info border-opacity-25 py-1 px-2" style="font-size: 0.7rem;">
+              {{ sk }}
+            </span>
+          </div>
+
+          <!-- Si une Review est associée à ce projet -->
+          <div *ngIf="getReviewForProject(p.id) as r" class="project-attached-review p-3 rounded-3 mt-2">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-patch-check-fill text-warning"></i>
+                <span class="fw-bold text-white small">Retour d'expérience du client ({{ r.clientName || 'Client' }})</span>
+              </div>
+              <div class="text-warning small">
+                <i *ngFor="let s of getStars(r.rating)" class="bi bi-star-fill me-1"></i>
+                <strong class="text-white ms-1">({{ r.rating }}/5)</strong>
+              </div>
+            </div>
+            <p class="text-subtle small mb-0 fst-italic">"{{ r.comment }}"</p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== SECTION 2 : AVIS CLIENTS & ÉTOILES ==================== -->
+    <div class="premium-card p-4 p-md-5 mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+          <h4 class="brand-font fw-bold text-white mb-0 fs-5">
+            <i class="bi bi-star-half text-warning me-2"></i> Évaluations & Avis Clients Certifiés
+          </h4>
+          <p class="text-subtle small mb-0">Commentaires certifiés laissés par les porteurs de projets à la clôture.</p>
+        </div>
+        <span class="count-pill py-1 px-3" style="font-size: 0.75rem;">
+          {{ reviews.length }} évaluation{{ reviews.length > 1 ? 's' : '' }}
+        </span>
+      </div>
+
+      <!-- Score Hero Box -->
+      <div class="review-score-hero p-4 rounded-4 mb-4 d-flex flex-column flex-sm-row align-items-center gap-4 border" *ngIf="reviews.length > 0">
+        <div class="text-center score-big-block px-3">
+          <div class="brand-font fw-extrabold text-warning display-4 mb-0">
+            {{ averageRating > 0 ? (averageRating | number:'1.1-1') : '5.0' }}
+          </div>
+          <div class="text-warning mb-1">
+            <i *ngFor="let s of getStars(averageRating || 5)" class="bi bi-star-fill me-1"></i>
+          </div>
+          <small class="text-subtle">sur 5.0 (Score certifié)</small>
+        </div>
+
+        <div class="vr bg-secondary opacity-25 d-none d-sm-block" style="height: 80px;"></div>
+
+        <div class="flex-grow-1 text-center text-sm-start">
+          <h6 class="text-white fw-bold mb-1">Indice de Réputation FreelanceHub.AI</h6>
+          <p class="text-subtle small mb-2">
+            Toutes les notes et retours proviennent de missions réelles entièrement exécutées et validées sous séquestre Escrow.
+          </p>
+          <div class="d-flex align-items-center gap-2 justify-content-center justify-content-sm-start flex-wrap">
+            <span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-25 py-1 px-2 small">
+              <i class="bi bi-shield-check me-1"></i>100% Recommandé
+            </span>
+            <span class="badge bg-info bg-opacity-25 text-info border border-info border-opacity-25 py-1 px-2 small">
+              <i class="bi bi-clock-check me-1"></i>100% Délais Respectés
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State Reviews -->
+      <div *ngIf="reviews.length === 0" class="empty-box p-4 text-center rounded-4">
+        <i class="bi bi-star text-subtle fs-2 mb-2 d-block"></i>
+        <h6 class="text-white fw-bold mb-1">Aucune évaluation enregistrée pour le moment</h6>
+        <p class="text-subtle small mb-0">Les avis clients et notes par étoiles apparaîtront dès la clôture des premières missions.</p>
+      </div>
+
+      <!-- Liste des avis -->
+      <div class="d-flex flex-column gap-3" *ngIf="reviews.length > 0">
+        <div *ngFor="let r of reviews" class="review-item-card p-4 rounded-4 border">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <div class="d-flex align-items-center gap-3">
+              <div class="avatar-holo-ring" style="width: 36px; height: 36px;">
+                <div class="avatar-inner" style="font-size: 0.85rem;">
+                  {{ (r.clientName || 'C').charAt(0) }}
+                </div>
+              </div>
+              <div>
+                <span class="fw-bold text-white small d-block">{{ r.clientName || 'Client Partenaire' }}</span>
+                <span class="text-muted small" *ngIf="r.projectTitle" style="font-size: 0.72rem;">
+                  Mission : <span class="text-info">{{ r.projectTitle }}</span>
+                </span>
+              </div>
+            </div>
+
+            <!-- Étoiles -->
+            <div class="text-warning small text-end">
+              <i *ngFor="let star of getStars(r.rating)" class="bi bi-star-fill me-1"></i>
+              <span class="text-white fw-bold ms-1">({{ r.rating }}/5)</span>
+            </div>
+          </div>
+
+          <p class="text-subtle small mb-2 fst-italic ps-md-5" style="line-height: 1.6;">
+            "{{ r.comment }}"
+          </p>
+
+          <div class="text-end" *ngIf="r.createdAt">
+            <small class="text-muted" style="font-size: 0.7rem;">
+              <i class="bi bi-calendar-check me-1"></i>{{ r.createdAt | date:'dd/MM/yyyy' }}
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>

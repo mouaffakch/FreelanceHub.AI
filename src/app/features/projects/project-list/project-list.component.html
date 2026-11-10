@@ -1,0 +1,266 @@
+<app-navbar></app-navbar>
+
+<div class="container py-4 fade-up">
+  
+  <!-- ==================== HEADER MARKETPLACE ==================== -->
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div>
+      <div class="badge-ai mb-2">
+        <i class="bi bi-briefcase-fill"></i> Missions & Appels d'Offres IT
+      </div>
+      <h1 class="brand-font fw-extrabold text-white mb-1">
+        Marketplace des <span class="text-gradient">Opportunités</span>
+      </h1>
+      <p class="text-subtle small mb-0">
+        Explorez les missions vérifiées et postulez avec des propositions générées sur-mesure par l'IA.
+      </p>
+    </div>
+
+    <div class="d-flex align-items-center gap-2">
+      <span class="count-pill">
+        <span class="pulse-dot"></span>
+        {{ filteredProjects.length }} projet(s) actif(s)
+      </span>
+      <a routerLink="/project-form" class="btn-ai-glow py-2 px-3 small" *ngIf="!isFreelance">
+        <i class="bi bi-plus-lg me-1"></i> Publier une Mission
+      </a>
+    </div>
+  </div>
+
+  <!-- Messages Flash -->
+  <div *ngIf="error" class="alert alert-danger border-0 rounded-4 shadow-sm mb-4 d-flex align-items-center">
+    <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+    <span>{{ error }}</span>
+  </div>
+  <div *ngIf="successMsg" class="alert alert-success border-0 rounded-4 shadow-sm mb-4 d-flex align-items-center">
+    <i class="bi bi-check-circle-fill me-2 fs-5"></i>
+    <span>{{ successMsg }}</span>
+  </div>
+
+  <!-- ==================== BARRE DE RECHERCHE & FILTRES CYBERPUNK ==================== -->
+  <div class="premium-card p-4 mb-4">
+    <div class="row g-3 align-items-center">
+      
+      <!-- Input Recherche -->
+      <div class="col-md-7">
+        <div class="search-input-box">
+          <i class="bi bi-search search-icon"></i>
+          <input 
+            type="text" 
+            class="form-control input-premium ps-5" 
+            placeholder="Rechercher par titre, mot-clé technique ou client..."
+            [(ngModel)]="searchTerm">
+        </div>
+      </div>
+
+      <!-- Tri -->
+      <div class="col-md-5">
+        <div class="d-flex align-items-center gap-2">
+          <span class="text-subtle small fw-bold text-nowrap">Trier par :</span>
+          <select class="form-select input-premium py-2" [(ngModel)]="sortBy">
+            <option value="recent">⚡ Plus Récents</option>
+            <option value="budget_desc">💰 Budget Décroissant (€)</option>
+            <option value="budget_asc">📈 Budget Croissant (€)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Chips de compétences -->
+      <div class="col-12 pt-3 border-top mt-3">
+        <div class="d-flex flex-wrap align-items-center gap-2">
+          <span class="text-subtle small fw-bold me-1">Technologies :</span>
+          <button 
+            type="button" 
+            class="filter-chip"
+            [class.active-chip]="selectedSkill === 'ALL'"
+            (click)="selectedSkill = 'ALL'">
+            Toutes
+          </button>
+          <button 
+            *ngFor="let skill of availableSkills" 
+            type="button" 
+            class="filter-chip"
+            [class.active-chip]="selectedSkill === skill"
+            (click)="selectedSkill = skill">
+            {{ skill }}
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-info" role="status" style="width: 3rem; height: 3rem;"></div>
+    <p class="text-subtle mt-3 small">Scan des missions IT en cours...</p>
+  </div>
+
+  <!-- Empty state -->
+  <div *ngIf="!loading && filteredProjects.length === 0" class="text-center py-5 premium-card">
+    <div class="mb-3">
+      <i class="bi bi-search text-subtle display-4"></i>
+    </div>
+    <h5 class="fw-bold text-white mb-2">Aucun projet ne correspond à vos critères</h5>
+    <p class="text-subtle small mb-3">Modifiez vos mots-clés ou réinitialisez le filtre de technologie.</p>
+    <button class="btn btn-outline-primary btn-sm px-4" (click)="searchTerm = ''; selectedSkill = 'ALL'">
+      <i class="bi bi-arrow-counterclockwise me-1"></i> Réinitialiser les filtres
+    </button>
+  </div>
+
+  <!-- ==================== GRILLE DES PROJETS (RICH CARDS) ==================== -->
+  <div class="row g-4" *ngIf="!loading && filteredProjects.length > 0">
+    <div *ngFor="let p of filteredProjects" class="col-md-6 col-lg-4">
+      <div class="project-card premium-card p-4 h-100 d-flex flex-column justify-content-between">
+        
+        <div>
+          <!-- Top Row: Statut & Budget -->
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="badge-status-pill"
+                  [class.status-open]="p.status === 'OPEN' || !p.status"
+                  [class.status-progress]="p.status === 'IN_PROGRESS'"
+                  [class.status-closed]="p.status === 'CLOSED'">
+              <span class="status-dot"></span>
+              {{ p.status || 'OPEN' }}
+            </span>
+
+            <div class="project-budget">
+              {{ p.budget | number }} €
+            </div>
+          </div>
+
+          <!-- Titre Projet -->
+          <h5 class="project-title text-white mb-2">{{ p.title }}</h5>
+
+          <!-- Client & Date -->
+          <div class="project-meta d-flex align-items-center gap-2 mb-3">
+            <div class="client-badge d-flex align-items-center gap-1">
+              <i class="bi bi-building text-cyan"></i>
+              <span>{{ p.clientName || 'Client Partenaire' }}</span>
+            </div>
+            <span class="meta-separator">•</span>
+            <span *ngIf="p.deadline" class="text-subtle small">
+              <i class="bi bi-calendar3 me-1"></i>{{ p.deadline | date:'dd/MM/yyyy' }}
+            </span>
+          </div>
+
+          <!-- Description -->
+          <p class="project-desc mb-3">
+            {{ p.description }}
+          </p>
+
+          <!-- Badges de Compétences Requises -->
+          <div class="d-flex flex-wrap gap-1 mb-3" *ngIf="getSkillNames(p).length > 0">
+            <span *ngFor="let s of getSkillNames(p)" class="tech-tag">
+              {{ s }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Footer Card : Actions -->
+        <div class="pt-3 border-top mt-auto">
+          <!-- Projet en cours -->
+          <button *ngIf="p.status && p.status !== 'OPEN'" class="btn-card-disabled w-100" disabled>
+            <i class="bi bi-lock-fill me-1"></i> Projet attribué
+          </button>
+
+          <!-- Déjà postulé -->
+          <button *ngIf="(!p.status || p.status === 'OPEN') && hasApplied(p.id)" class="btn-applied w-100" disabled>
+            <i class="bi bi-check-circle-fill me-1"></i> Candidature Envoyée
+          </button>
+
+          <!-- Bouton Postuler -->
+          <button *ngIf="(!p.status || p.status === 'OPEN') && !hasApplied(p.id)" 
+                  class="btn-ai-glow w-100"
+                  (click)="openApplyModal(p)">
+            <span>Postuler à la Mission</span>
+            <i class="bi bi-arrow-right"></i>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== MODALE DE CANDIDATURE AVEC ASSISTANT IA ==================== -->
+<div *ngIf="showApplyModal" class="modal-backdrop fade show"></div>
+
+<div *ngIf="showApplyModal" class="modal d-block fade show" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content overflow-hidden">
+      
+      <!-- Header -->
+      <div class="modal-header modal-header-gradient p-4 text-white">
+        <div>
+          <span class="badge-modal-tag mb-1">
+            <i class="bi bi-send-fill me-1"></i> Candidature Freelance
+          </span>
+          <h4 class="modal-title fw-bold text-white mb-0">{{ targetProject?.title }}</h4>
+          <div class="d-flex align-items-center gap-3 mt-1 small text-white-50">
+            <span><i class="bi bi-wallet2 me-1"></i> Budget : <strong>{{ targetProject?.budget }} €</strong></span>
+            <span><i class="bi bi-building me-1"></i> Client : <strong>{{ targetProject?.clientName || 'Client Partenaire' }}</strong></span>
+          </div>
+        </div>
+        <button type="button" class="btn-close-custom" (click)="closeApplyModal()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <!-- Body -->
+      <div class="modal-body p-4">
+        
+        <!-- Assistant IA Bandeau -->
+        <div class="ai-assistant-banner p-3 mb-4 rounded-4">
+          <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-2">
+            <div class="d-flex align-items-center gap-2">
+              <span class="badge-ai"><i class="bi bi-stars"></i> IA Générative</span>
+              <span class="fw-bold text-white small">Rédacteur de Proposition Automatique</span>
+            </div>
+            <button 
+              type="button" 
+              class="btn-generate-proposal"
+              [disabled]="generatingProposal"
+              (click)="generateAiProposal()">
+              <span *ngIf="generatingProposal" class="spinner-border spinner-border-sm me-1"></span>
+              <i *ngIf="!generatingProposal" class="bi bi-magic me-1"></i>
+              {{ generatingProposal ? 'Génération en cours...' : '✨ Générer ma proposition sur-mesure' }}
+            </button>
+          </div>
+          <p class="text-subtle small mb-0" style="font-size: 0.8rem;">
+            Notre modèle IA analyse vos compétences et les exigences techniques du projet pour synthétiser une proposition percutante et structurée.
+          </p>
+        </div>
+
+        <div *ngIf="applyError" class="alert alert-danger border-0 rounded-3 small mb-3">
+          <i class="bi bi-exclamation-triangle-fill me-1"></i>{{ applyError }}
+        </div>
+
+        <!-- Zone de texte proposition -->
+        <label class="form-label fw-bold text-light small mb-1">Votre Message / Lettre de Proposition</label>
+        <textarea 
+          class="form-control input-premium font-monospace-custom" 
+          rows="8" 
+          [(ngModel)]="coverLetter"
+          placeholder="Exprimez votre motivation, votre compréhension du besoin et vos propositions techniques..."></textarea>
+      </div>
+
+      <!-- Footer -->
+      <div class="modal-footer p-3 d-flex justify-content-between">
+        <button type="button" class="btn btn-outline-secondary px-3" (click)="closeApplyModal()">
+          Annuler
+        </button>
+        <button 
+          type="button" 
+          class="btn-ai-glow px-4" 
+          [disabled]="submittingApplication || !coverLetter.trim()"
+          (click)="submitApplication()">
+          <span *ngIf="submittingApplication" class="spinner-border spinner-border-sm me-2"></span>
+          {{ submittingApplication ? 'Transmission...' : '🚀 Envoyer ma Candidature' }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>

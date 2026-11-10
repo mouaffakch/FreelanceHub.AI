@@ -1,0 +1,366 @@
+<app-navbar></app-navbar>
+
+<div class="container py-4 fade-up">
+  
+  <!-- ==================== EN-TÊTE ADMIN ==================== -->
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+    <div>
+      <div class="badge-ai mb-2">
+        <i class="bi bi-shield-lock-fill"></i> Panneau d'Administration & Modération
+      </div>
+      <h1 class="brand-font fw-extrabold text-white mb-1">
+        Cockpit <span class="text-gradient">Administrateur</span>
+      </h1>
+      <p class="text-subtle small mb-0">Supervisez l'écosystème global, la modération des comptes et les transactions sous séquestre (Escrow).</p>
+    </div>
+    <div class="mt-3 mt-md-0">
+      <button (click)="loadUsers(); loadStats(); loadPayments()" class="btn btn-outline-primary btn-sm px-3 fw-bold">
+        <i class="bi bi-arrow-clockwise me-1"></i> Actualiser les données
+      </button>
+    </div>
+  </div>
+
+  <!-- Messages Flash -->
+  <div class="alert alert-success border-0 rounded-4 shadow-sm small mb-4 d-flex align-items-center" *ngIf="successMsg">
+    <i class="bi bi-check-circle-fill me-2 fs-5"></i>
+    <span>{{ successMsg }}</span>
+  </div>
+  <div class="alert alert-danger border-0 rounded-4 shadow-sm small mb-4 d-flex align-items-center" *ngIf="error">
+    <i class="bi bi-exclamation-circle-fill me-2 fs-5"></i>
+    <span>{{ error }}</span>
+  </div>
+
+  <!-- ==================== CARTES KPI PRINCIPALES ==================== -->
+  <div class="row g-3 mb-4">
+    
+    <div class="col-md-3 col-6">
+      <div class="kpi-card premium-card p-3 text-center">
+        <div class="kpi-icon-box text-violet mb-2">
+          <i class="bi bi-people-fill fs-4"></i>
+        </div>
+        <h3 class="kpi-num mb-0">{{ stats?.totalUsers || users.length }}</h3>
+        <p class="text-subtle small mb-0 fw-medium">Total Utilisateurs</p>
+      </div>
+    </div>
+
+    <div class="col-md-3 col-6">
+      <div class="kpi-card premium-card p-3 text-center">
+        <div class="kpi-icon-box text-cyan mb-2">
+          <i class="bi bi-shield-lock-fill fs-4"></i>
+        </div>
+        <h3 class="kpi-num mb-0 text-emerald">{{ totalEscrowVolume | number }} €</h3>
+        <p class="text-subtle small mb-0 fw-medium">Volume Escrow Séquestré</p>
+      </div>
+    </div>
+
+    <div class="col-md-3 col-6">
+      <div class="kpi-card premium-card p-3 text-center">
+        <div class="kpi-icon-box text-emerald mb-2">
+          <i class="bi bi-cash-coin fs-4"></i>
+        </div>
+        <h3 class="kpi-num mb-0 text-cyan">{{ totalPlatformCommission | number }} €</h3>
+        <p class="text-subtle small mb-0 fw-medium">Commissions FreelanceHub (10%)</p>
+      </div>
+    </div>
+
+    <div class="col-md-3 col-6">
+      <div class="kpi-card premium-card p-3 text-center">
+        <div class="kpi-icon-box text-amber mb-2">
+          <i class="bi bi-star-fill fs-4"></i>
+        </div>
+        <h3 class="kpi-num mb-0">{{ stats?.averageRating || 0 }}</h3>
+        <p class="text-subtle small mb-0 fw-medium">Note Moyenne ⭐</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- DEUXIÈME LIGNE STATS DÉTAILLÉES -->
+  <div class="row g-3 mb-4" *ngIf="stats">
+    <div class="col-md-2 col-4">
+      <div class="premium-card p-3 text-center">
+        <h4 class="fw-extrabold text-cyan mb-0">{{ stats.totalClients }}</h4>
+        <p class="text-subtle small mb-0">Clients</p>
+      </div>
+    </div>
+    <div class="col-md-2 col-4">
+      <div class="premium-card p-3 text-center">
+        <h4 class="fw-extrabold text-violet mb-0">{{ stats.totalFreelances }}</h4>
+        <p class="text-subtle small mb-0">Freelances</p>
+      </div>
+    </div>
+    <div class="col-md-2 col-4">
+      <div class="premium-card p-3 text-center">
+        <h4 class="fw-extrabold text-emerald mb-0">{{ stats.openProjects }}</h4>
+        <p class="text-subtle small mb-0">Ouverts</p>
+      </div>
+    </div>
+    <div class="col-md-2 col-4">
+      <div class="premium-card p-3 text-center">
+        <h4 class="fw-extrabold text-amber mb-0">{{ stats.inProgressProjects }}</h4>
+        <p class="text-subtle small mb-0">En cours</p>
+      </div>
+    </div>
+    <div class="col-md-2 col-4">
+      <div class="premium-card p-3 text-center">
+        <h4 class="fw-extrabold text-white mb-0">{{ stats.totalApplications }}</h4>
+        <p class="text-subtle small mb-0">Candidatures</p>
+      </div>
+    </div>
+    <div class="col-md-2 col-4">
+      <div class="premium-card p-3 text-center">
+        <h4 class="fw-extrabold text-danger mb-0">{{ activeDisputesCount }}</h4>
+        <p class="text-subtle small mb-0">Litiges Actifs</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SECTION TRANSACTIONS FINANCIÈRES & ESCROW ==================== -->
+  <div class="premium-card p-4 mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div>
+        <h4 class="brand-font fw-bold text-white mb-0">
+          <i class="bi bi-bank2 text-cyan me-2"></i> Supervision des Paiements & Arbitrage Escrow
+        </h4>
+        <p class="text-subtle small mb-0">Contrôle des flux financiers sous séquestre et traitement des litiges.</p>
+      </div>
+      <span class="count-pill py-1 px-3" style="font-size: 0.75rem;">{{ payments.length }} transaction(s)</span>
+    </div>
+
+    <!-- Alert si litiges actifs -->
+    <div *ngIf="activeDisputesCount > 0" class="alert alert-warning border-0 rounded-4 p-3 mb-3 d-flex align-items-center justify-content-between">
+      <div class="d-flex align-items-center gap-2">
+        <i class="bi bi-exclamation-triangle-fill fs-4 text-warning"></i>
+        <span><strong>{{ activeDisputesCount }} litige(s) en attente d'arbitrage</strong>. Les fonds sont gelés sous séquestre.</span>
+      </div>
+    </div>
+
+    <div *ngIf="loadingPayments" class="text-center py-4">
+      <div class="spinner-border spinner-border-sm text-info"></div>
+      <span class="text-subtle ms-2 small">Chargement des transactions...</span>
+    </div>
+
+    <div class="table-responsive" *ngIf="!loadingPayments">
+      <table class="table align-middle mb-0">
+        <thead>
+          <tr>
+            <th class="border-0">RÉFÉRENCE & DATE</th>
+            <th class="border-0">PROJET & PARTIES</th>
+            <th class="border-0">MONTANT SÉQUESTRÉ</th>
+            <th class="border-0">COMMISSION (10%)</th>
+            <th class="border-0">STATUT ESCROW</th>
+            <th class="border-0 text-end">ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of payments">
+            <td>
+              <div class="fw-bold text-white font-monospace small">{{ p.transactionRef }}</div>
+              <div class="text-subtle" style="font-size: 0.72rem;">{{ p.createdAt | date:'dd/MM/yyyy HH:mm' }}</div>
+            </td>
+
+            <td>
+              <div class="fw-bold text-white small">{{ p.projectTitle }}</div>
+              <div class="text-subtle" style="font-size: 0.75rem;">
+                Client: <span class="text-white">{{ p.clientName }}</span> | Freelance: <span class="text-cyan">{{ p.freelanceName || 'Non assigné' }}</span>
+              </div>
+            </td>
+
+            <td>
+              <strong class="text-emerald fs-6">{{ p.amount | number }} €</strong>
+              <div class="text-subtle" style="font-size: 0.72rem;">Net freelance: {{ p.netAmount | number }} €</div>
+            </td>
+
+            <td class="text-white fw-bold">{{ p.platformFee | number }} €</td>
+
+            <td>
+              <span class="badge" 
+                    [class.bg-success-subtle]="p.status === 'HELD_IN_ESCROW'"
+                    [class.text-success]="p.status === 'HELD_IN_ESCROW'"
+                    [class.bg-primary-subtle]="p.status === 'RELEASED'"
+                    [class.text-primary]="p.status === 'RELEASED'"
+                    [class.bg-warning-subtle]="p.status === 'DISPUTED'"
+                    [class.text-warning]="p.status === 'DISPUTED'"
+                    [class.bg-danger-subtle]="p.status === 'REFUNDED'"
+                    [class.text-danger]="p.status === 'REFUNDED'">
+                {{ p.status }}
+              </span>
+            </td>
+
+            <td class="text-end">
+              <button *ngIf="p.status === 'DISPUTED'" 
+                      (click)="openResolveModal(p)" 
+                      class="btn btn-warning btn-sm fw-bold text-dark px-3 py-1">
+                <i class="bi bi-hammer me-1"></i> Arbitrer le Litige
+              </button>
+              <span *ngIf="p.status !== 'DISPUTED'" class="text-subtle small fst-italic">
+                Traité
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ==================== TABLEAU DE GESTION DES UTILISATEURS ==================== -->
+  <div class="premium-card p-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h4 class="brand-font fw-bold text-white mb-0">Annuaire des Utilisateurs & Modération</h4>
+        <p class="text-subtle small mb-0">Contrôle des accès, rôles et statuts de compte.</p>
+      </div>
+      <span class="count-pill py-1 px-3" style="font-size: 0.75rem;">{{ users.length }} membre(s)</span>
+    </div>
+
+    <div *ngIf="loadingUsers" class="text-center py-5">
+      <div class="spinner-border text-info spinner-border-sm me-2"></div>
+      <span class="text-subtle">Chargement des comptes utilisateurs...</span>
+    </div>
+
+    <div class="table-responsive" *ngIf="!loadingUsers">
+      <table class="table align-middle mb-0">
+        <thead>
+          <tr>
+            <th class="border-0">UTILISATEUR</th>
+            <th class="border-0">EMAIL</th>
+            <th class="border-0">RÔLE</th>
+            <th class="border-0">STATUT</th>
+            <th class="border-0 text-end">ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let u of users">
+            
+            <!-- Nom & Avatar -->
+            <td>
+              <div class="d-flex align-items-center gap-3">
+                <div class="avatar-holo-ring" style="width: 38px; height: 38px;">
+                  <div class="avatar-inner" style="font-size: 0.85rem;">
+                    {{ u.firstname ? u.firstname.charAt(0) : 'U' }}
+                  </div>
+                </div>
+                <div>
+                  <div class="fw-bold text-white small">{{ u.firstname }} {{ u.lastname }}</div>
+                  <div class="text-subtle" style="font-size: 0.72rem;">UID #{{ u.id }}</div>
+                </div>
+              </div>
+            </td>
+
+            <!-- Email -->
+            <td class="text-light small font-monospace">{{ u.email }}</td>
+
+            <!-- Rôle -->
+            <td>
+              <span class="badge-role-pill"
+                    [class.role-admin]="u.roleName && u.roleName.includes('ADMIN')"
+                    [class.role-client]="u.roleName && u.roleName.includes('CLIENT')"
+                    [class.role-freelance]="u.roleName && u.roleName.includes('FREELANCE')">
+                {{ u.roleName ? u.roleName.replace('ROLE_', '') : '' }}
+              </span>
+            </td>
+
+            <!-- Statut -->
+            <td>
+              <span class="badge-status-pill"
+                    [class.status-open]="u.status === 'ACTIVE'"
+                    [class.status-closed]="u.status === 'SUSPENDED'"
+                    [class.status-progress]="u.status === 'PENDING'">
+                <span class="status-dot"></span>
+                {{ u.status || 'ACTIVE' }}
+              </span>
+            </td>
+
+            <!-- Actions -->
+            <td class="text-end">
+              <button *ngIf="u.status !== 'SUSPENDED'" 
+                      (click)="suspend(u.id)" 
+                      class="btn btn-outline-danger btn-sm px-3 py-1" 
+                      title="Suspendre ce compte">
+                <i class="bi bi-slash-circle me-1"></i> Suspendre
+              </button>
+
+              <button *ngIf="u.status === 'SUSPENDED'" 
+                      (click)="activate(u.id)" 
+                      class="btn btn-success btn-sm px-3 py-1 text-white fw-bold" 
+                      title="Activer ce compte">
+                <i class="bi bi-check-circle me-1"></i> Activer
+              </button>
+            </td>
+
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== MODALE D'ARBITRAGE DE LITIGE (ADMIN) ==================== -->
+<div *ngIf="showResolveModal" class="modal-backdrop fade show"></div>
+
+<div *ngIf="showResolveModal" class="modal d-block fade show" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content overflow-hidden">
+      
+      <div class="modal-header bg-warning text-dark p-4">
+        <div>
+          <span class="badge bg-dark text-warning fw-bold mb-1"><i class="bi bi-hammer me-1"></i> Tribunal Arbitral de la Plateforme</span>
+          <h5 class="modal-title fw-bold text-dark mb-0">Arbitrage du Contrat en Litige</h5>
+        </div>
+        <button type="button" class="btn-close-custom text-dark" (click)="closeResolveModal()"><i class="bi bi-x-lg"></i></button>
+      </div>
+
+      <div class="modal-body p-4" *ngIf="selectedDisputePayment">
+        
+        <div class="p-3 rounded-4 mb-3" style="background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-glass-bright);">
+          <div class="row g-2 small">
+            <div class="col-6">
+              <span class="text-subtle d-block">PROJET CONCERNÉ :</span>
+              <strong class="text-white">{{ selectedDisputePayment.projectTitle }}</strong>
+            </div>
+            <div class="col-6">
+              <span class="text-subtle d-block">MONTANT SÉQUESTRÉ :</span>
+              <strong class="text-emerald fs-6">{{ selectedDisputePayment.amount | number }} €</strong>
+            </div>
+            <div class="col-6">
+              <span class="text-subtle d-block">CLIENT COMMANDITAIRE :</span>
+              <span class="text-white">{{ selectedDisputePayment.clientName }}</span>
+            </div>
+            <div class="col-6">
+              <span class="text-subtle d-block">FREELANCE DÉSIGNÉ :</span>
+              <span class="text-cyan">{{ selectedDisputePayment.freelanceName }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="alert alert-danger border-0 rounded-3 mb-3 small">
+          <strong><i class="bi bi-exclamation-triangle-fill me-1"></i> Motif déclaré :</strong>
+          <p class="mb-0 mt-1 fst-italic">"{{ selectedDisputePayment.disputeReason }}"</p>
+        </div>
+
+        <label class="form-label text-light fw-bold small mb-1">Rapport & Motivation de l'Arbitrage :</label>
+        <textarea class="form-control input-premium" rows="3" [(ngModel)]="disputeResolutionText"
+                  placeholder="Justifiez la décision arbitrale (conforme aux CGU)..."></textarea>
+
+        <div class="mt-4 pt-3 border-top d-flex flex-column flex-sm-row justify-content-between align-items-center gap-3">
+          <button type="button" 
+                  class="btn btn-outline-danger w-100" 
+                  [disabled]="resolvingDispute || !disputeResolutionText.trim()"
+                  (click)="executeDisputeResolution('REFUND_CLIENT')">
+            <i class="bi bi-arrow-counterclockwise me-1"></i> Rembourser le Client (Annuler Projet)
+          </button>
+
+          <button type="button" 
+                  class="btn btn-success text-white fw-bold w-100" 
+                  [disabled]="resolvingDispute || !disputeResolutionText.trim()"
+                  (click)="executeDisputeResolution('RELEASE_FREELANCE')">
+            <i class="bi bi-check-circle-fill me-1"></i> Débloquer au Freelance (Valider Projet)
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>

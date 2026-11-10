@@ -1,0 +1,127 @@
+<div class="nav-wrapper container-fluid px-3 px-md-4 pt-3 mb-4">
+  <nav class="navbar navbar-expand-lg futuristic-navbar px-3 px-md-4 py-2">
+    <div class="container-fluid px-0">
+      
+      <!-- Brand Logo avec 3D Holographic Cube -->
+      <a class="navbar-brand d-flex align-items-center gap-3" [routerLink]="auth.isLoggedIn() ? dashboardLink : '/'">
+        <div class="brand-logo-box">
+          <i class="bi bi-cpu-fill logo-icon"></i>
+          <span class="logo-glow"></span>
+        </div>
+        <div class="d-flex flex-column lh-1">
+          <span class="brand-title">FreelanceHub<span class="brand-ai-tag">.AI</span></span>
+          <span class="brand-sub">Next-Gen IT Ecosystem</span>
+        </div>
+      </a>
+
+      <!-- Mobile Toggle -->
+      <button class="navbar-toggler custom-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <i class="bi bi-list text-light fs-3"></i>
+      </button>
+
+      <!-- Navigation Links -->
+      <div class="collapse navbar-collapse" id="navbarNav">
+        
+        <!-- Auth Links -->
+        <ul class="navbar-nav me-auto ms-lg-4 gap-1 gap-lg-2" *ngIf="auth.isLoggedIn()">
+          <li class="nav-item">
+            <a class="nav-pill-link" [routerLink]="dashboardLink" routerLinkActive="active-pill">
+              <i class="bi bi-speedometer2"></i> Cockpit
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-pill-link" routerLink="/projects" routerLinkActive="active-pill">
+              <i class="bi bi-grid-1x2-fill"></i> Marketplace
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-pill-link" routerLink="/freelancers" routerLinkActive="active-pill">
+              <i class="bi bi-people-fill"></i> Talents
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-pill-link" routerLink="/ai-tools" routerLinkActive="active-pill">
+              <i class="bi bi-stars"></i> Lab IA
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-pill-link" routerLink="/profile" routerLinkActive="active-pill">
+              <i class="bi bi-person-badge"></i> Profil
+            </a>
+          </li>
+        </ul>
+
+        <!-- Right Side: User Profile & Actions -->
+        <div class="d-flex align-items-center gap-2 gap-md-3 ms-auto mt-3 mt-lg-0" *ngIf="auth.isLoggedIn(); else guestNav">
+          
+          <!-- Notification Bell -->
+          <div class="position-relative">
+            <button class="btn-notification-bell" type="button" (click)="toggleNotifications()" title="Notifications">
+              <i class="bi bi-bell-fill"></i>
+              <span class="notification-badge-pulse" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
+            </button>
+
+            <!-- Notifications Dropdown Panel -->
+            <div class="notifications-dropdown-panel p-3 rounded-4 shadow-lg" *ngIf="showNotifications">
+              <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom border-white-10">
+                <span class="fw-bold text-white small"><i class="bi bi-bell me-1 text-info"></i> Notifications</span>
+                <button type="button" class="btn btn-link text-subtle text-decoration-none p-0 small" style="font-size: 0.72rem;" (click)="markAllAsRead()">
+                  Tout marquer comme lu
+                </button>
+              </div>
+
+              <div class="notifications-list d-flex flex-column gap-2" style="max-height: 280px; overflow-y: auto;">
+                <div *ngFor="let notif of notifications" class="notification-item p-2 rounded-3" [class.unread]="!notif.read">
+                  <div class="d-flex align-items-start gap-2">
+                    <i class="bi" [ngClass]="notif.icon" [class.text-cyan]="notif.type === 'info'" [class.text-success]="notif.type === 'success'" [class.text-warning]="notif.type === 'warning'"></i>
+                    <div class="flex-grow-1">
+                      <div class="notification-title fw-bold text-white small" style="font-size: 0.78rem;">{{ notif.title }}</div>
+                      <div class="notification-desc text-subtle" style="font-size: 0.72rem;">{{ notif.text }}</div>
+                      <small class="text-muted" style="font-size: 0.65rem;">{{ notif.time }}</small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- User Chip Card -->
+          <a [routerLink]="'/profile'" class="user-chip-card text-decoration-none d-flex align-items-center gap-2 gap-md-3">
+            <div class="avatar-holo-ring">
+              <div class="avatar-inner">
+                {{ (auth.currentUser$ | async)?.fullName?.charAt(0) || 'U' }}
+              </div>
+            </div>
+            <div class="d-none d-md-block text-start lh-1">
+              <div class="user-name">{{ (auth.currentUser$ | async)?.fullName }}</div>
+              <span class="badge-role-tag">
+                <span class="pulse-dot"></span>
+                {{ (auth.currentUser$ | async)?.roleName?.replace('ROLE_', '') }}
+              </span>
+            </div>
+          </a>
+
+          <!-- Logout Button -->
+          <button class="btn-logout" (click)="auth.logout()" title="Déconnexion">
+            <i class="bi bi-box-arrow-right"></i>
+            <span class="d-none d-sm-inline ms-1">Sortie</span>
+          </button>
+        </div>
+
+        <!-- Guest Nav -->
+        <ng-template #guestNav>
+          <div class="d-flex align-items-center gap-3 ms-auto mt-3 mt-lg-0">
+            <a routerLink="/login" class="nav-pill-link">
+              <i class="bi bi-box-arrow-in-right me-1"></i> Connexion
+            </a>
+            <a routerLink="/register" class="btn-ai-glow py-2 px-3">
+              <span>Commencer</span>
+              <i class="bi bi-arrow-right"></i>
+            </a>
+          </div>
+        </ng-template>
+
+      </div>
+    </div>
+  </nav>
+</div>

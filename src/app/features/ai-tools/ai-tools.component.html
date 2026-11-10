@@ -1,0 +1,358 @@
+<app-navbar></app-navbar>
+
+<div class="container py-4 fade-up" style="max-width: 1060px;">
+
+  <!-- ==================== HERO HEADER ==================== -->
+  <div class="text-center mb-5">
+    <div class="d-inline-flex mb-3">
+      <div class="lab-icon-box">
+        <i class="bi bi-cpu-fill fs-3"></i>
+        <span class="lab-icon-glow"></span>
+      </div>
+    </div>
+    
+    <div class="badge-ai mb-2 d-inline-flex">
+      <span class="pulse-dot"></span> Laboratoire d'Intelligence Artificielle
+    </div>
+    <h1 class="brand-font fw-extrabold text-white mb-2">
+      Hub des Moteurs <span class="text-gradient">IA Génératifs</span>
+    </h1>
+    <p class="text-subtle small" style="max-width: 620px; margin: 0 auto;">
+      Expérimentez les capacités génératives et sémantiques de FreelanceHub AI : rédaction automatique de cahiers des charges, propositions commerciales sur-mesure, amélioration de profil et scoring de matching NLP.
+    </p>
+  </div>
+
+  <!-- Messages Flash -->
+  <div *ngIf="error" class="alert alert-danger border-0 rounded-4 shadow-sm mb-4 d-flex align-items-center">
+    <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+    <span>{{ error }}</span>
+  </div>
+
+  <!-- ==================== TAB SELECTOR PILLS ==================== -->
+  <div class="tab-selector-bar d-flex flex-wrap justify-content-center gap-2 mb-4 p-2 rounded-4">
+    <button class="tab-pill-btn"
+            [class.active-tab]="activeTab === 'smart-project'"
+            (click)="setTab('smart-project')">
+      <i class="bi bi-file-earmark-code me-1"></i> 1. Assistant Projet
+    </button>
+    <button class="tab-pill-btn"
+            [class.active-tab]="activeTab === 'proposal'"
+            (click)="setTab('proposal')">
+      <i class="bi bi-envelope-paper me-1"></i> 2. Proposition Ciblée
+    </button>
+    <button class="tab-pill-btn"
+            [class.active-tab]="activeTab === 'profile'"
+            (click)="setTab('profile')">
+      <i class="bi bi-person-bounding-box me-1"></i> 3. Optimiseur Bio
+    </button>
+    <button class="tab-pill-btn"
+            [class.active-tab]="activeTab === 'skills'"
+            (click)="setTab('skills')">
+      <i class="bi bi-code-slash me-1"></i> 4. Extracteur NLP
+    </button>
+    <button class="tab-pill-btn"
+            [class.active-tab]="activeTab === 'recommendations'"
+            (click)="setTab('recommendations')">
+      <i class="bi bi-bullseye me-1"></i> 5. Smart Matching
+    </button>
+  </div>
+
+  <!-- ==================== TAB 1 : ASSISTANT PROJET COMPLET ==================== -->
+  <div *ngIf="activeTab === 'smart-project'" class="premium-card p-4 p-md-5">
+    <div class="d-flex align-items-center gap-2 mb-2">
+      <div class="badge-ai"><i class="bi bi-stars"></i> Générateur de Spécifications</div>
+      <span class="count-pill py-0 px-2" style="font-size: 0.68rem;">Product Owner & Client</span>
+    </div>
+    <h3 class="brand-font fw-extrabold text-white mb-1">Générateur Automatique de Cahier des Charges</h3>
+    <p class="text-subtle small mb-4">
+      Renseignez une simple idée métier : l'IA structure l'architecture logicielle, rédige les fonctionnalités clés, estime le budget et les délais.
+    </p>
+
+    <div class="row g-3 mb-3">
+      <div class="col-md-9">
+        <label class="form-label text-light fw-bold small mb-1">Votre idée de projet ou besoin fonctionnel</label>
+        <input 
+          type="text" 
+          class="form-control input-premium" 
+          [(ngModel)]="smartIdea" 
+          placeholder="Ex: Application mobile Flutter de livraison de repas avec suivi GPS et paiement Stripe"
+          (keydown.enter)="generateSmartProject()">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label text-light fw-bold small mb-1">Plateforme cible</label>
+        <select class="form-select input-premium" [(ngModel)]="smartPlatform">
+          <option value="Web">🌐 Web (Angular / React)</option>
+          <option value="Mobile">📱 Mobile (Flutter / React Native)</option>
+          <option value="Fullstack">⚡ Fullstack SaaS (Spring / Node)</option>
+          <option value="Data">🤖 Data & IA / Machine Learning</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Suggestions rapides cliquables -->
+    <div class="d-flex flex-wrap align-items-center gap-2 mb-4">
+      <small class="text-muted fw-bold">Suggestions à tester :</small>
+      <button class="quick-prompt-btn" 
+              (click)="smartIdea = 'Plateforme SaaS de gestion des congés et notes de frais avec dashboard analytics'; smartPlatform='Web'">
+        🏢 SaaS RH & Analytics
+      </button>
+      <button class="quick-prompt-btn" 
+              (click)="smartIdea = 'App mobile de téléconsultation médicale avec visio et ordonnances sécurisées'; smartPlatform='Mobile'">
+        🩺 Téléconsultation Médicale
+      </button>
+      <button class="quick-prompt-btn" 
+              (click)="smartIdea = 'Moteur de détection de fraudes bancaires par Machine Learning en temps réel'; smartPlatform='Data'">
+        🤖 IA Détection de Fraude
+      </button>
+    </div>
+
+    <button 
+      type="button" 
+      class="btn-ai-glow px-4" 
+      [disabled]="smartLoading || !smartIdea.trim()"
+      (click)="generateSmartProject()">
+      <span *ngIf="smartLoading" class="spinner-border spinner-border-sm me-2"></span>
+      <i *ngIf="!smartLoading" class="bi bi-cpu me-2"></i>
+      {{ smartLoading ? 'Analyse & Conception en cours...' : 'Générer le Cahier des Charges Complet' }}
+    </button>
+
+    <!-- Résultat Généré -->
+    <div *ngIf="smartResult" class="result-box mt-4 p-4 rounded-4 border">
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3 pb-3 border-bottom">
+        <div>
+          <span class="badge-role-pill role-client mb-1">{{ smartResult.architectureType }}</span>
+          <h4 class="brand-font fw-extrabold text-white mb-0">{{ smartResult.suggestedTitle }}</h4>
+        </div>
+        <div class="d-flex flex-wrap gap-2 align-items-center">
+          <span class="count-pill py-1 px-3 text-emerald">
+            💰 {{ smartResult.estimatedBudget | number }} €
+          </span>
+          <span class="count-pill py-1 px-3 text-cyan">
+            📅 {{ smartResult.suggestedDurationDays }} jours
+          </span>
+          <button class="btn btn-outline-primary btn-sm px-3" (click)="copyToClipboard(smartResult.fullDescription)">
+            <i class="bi" [class.bi-clipboard]="!copied" [class.bi-check2]="copied"></i>
+            {{ copied ? 'Copié !' : 'Copier le texte' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Compétences ciblées -->
+      <div class="mb-3">
+        <strong class="text-light small d-block mb-2">Technologies & Compétences Recommandées :</strong>
+        <div class="d-flex flex-wrap gap-1">
+          <span *ngFor="let s of smartResult.recommendedSkills" class="tech-tag">
+            {{ s }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Spécifications Markdown -->
+      <div class="code-preview-box p-3 rounded-3" style="max-height: 420px; overflow-y: auto;">
+        <pre class="mb-0 text-light font-monospace-custom" style="white-space: pre-wrap;">{{ smartResult.fullDescription }}</pre>
+      </div>
+
+      <div class="mt-3 text-end">
+        <a routerLink="/project-form" class="btn-ai-glow btn-sm">
+          <i class="bi bi-plus-circle me-1"></i> Utiliser pour créer une mission
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== TAB 2 : PROPOSITION SUR-MESURE ==================== -->
+  <div *ngIf="activeTab === 'proposal'" class="premium-card p-4 p-md-5">
+    <div class="d-flex align-items-center gap-2 mb-2">
+      <div class="badge-ai"><i class="bi bi-envelope-check"></i> Assistant Candidature</div>
+      <span class="count-pill py-0 px-2" style="font-size: 0.68rem;">Freelance</span>
+    </div>
+    <h3 class="brand-font fw-extrabold text-white mb-1">Rédacteur de Proposition Commerciale</h3>
+    <p class="text-subtle small mb-4">
+      Sélectionnez une mission existante : l'IA synthétise votre expertise et les exigences du client pour générer une lettre de motivation percutante et personnalisée.
+    </p>
+
+    <div class="row g-3 mb-4">
+      <div class="col-md-6">
+        <label class="form-label text-light fw-bold small mb-1">Sélectionner un projet cible</label>
+        <select class="form-select input-premium" [(ngModel)]="selectedProjectId">
+          <option *ngFor="let p of allProjects" [ngValue]="p.id">
+            #{{ p.id }} - {{ p.title }} ({{ p.budget | number }} €)
+          </option>
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label text-light fw-bold small mb-1">Notes ou arguments spécifiques (optionnel)</label>
+        <input type="text" class="form-control input-premium" [(ngModel)]="proposalNotes" placeholder="Ex: Disponible à temps plein, TJM négociable...">
+      </div>
+    </div>
+
+    <button 
+      type="button" 
+      class="btn-ai-glow px-4" 
+      [disabled]="proposalLoading || !selectedProjectId"
+      (click)="generateProposal()">
+      <span *ngIf="proposalLoading" class="spinner-border spinner-border-sm me-2"></span>
+      <i *ngIf="!proposalLoading" class="bi bi-magic me-2"></i>
+      {{ proposalLoading ? 'Rédaction de la proposition...' : 'Rédiger ma Proposition avec l\'IA' }}
+    </button>
+
+    <div *ngIf="proposalResult" class="result-box mt-4 p-4 rounded-4 border">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <span class="badge-status-pill status-open">
+          <span class="status-dot"></span> Proposition Optimisée Générée
+        </span>
+        <button class="btn btn-outline-primary btn-sm px-3" (click)="copyToClipboard(proposalResult.generatedText)">
+          <i class="bi" [class.bi-clipboard]="!copied" [class.bi-check2]="copied"></i>
+          {{ copied ? 'Copié !' : 'Copier le texte' }}
+        </button>
+      </div>
+      <div class="code-preview-box p-3 rounded-3">
+        <div class="text-light font-monospace-custom" style="white-space: pre-wrap;">{{ proposalResult.generatedText }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== TAB 3 : OPTIMISEUR DE PROFIL ==================== -->
+  <div *ngIf="activeTab === 'profile'" class="premium-card p-4 p-md-5">
+    <div class="d-flex align-items-center gap-2 mb-2">
+      <div class="badge-ai"><i class="bi bi-person-up"></i> Profil & Branding Tech</div>
+      <span class="count-pill py-0 px-2" style="font-size: 0.68rem;">Freelance</span>
+    </div>
+    <h3 class="brand-font fw-extrabold text-white mb-1">Amélioration Sémantique de Profil</h3>
+    <p class="text-subtle small mb-4">
+      Collez votre bio ou description actuelle. L'IA la restructure avec des formulations d'ingénierie percutantes et met en exergue vos compétences clés.
+    </p>
+
+    <label class="form-label text-light fw-bold small mb-1">Votre Bio ou Présentation actuelle</label>
+    <textarea 
+      class="form-control input-premium font-monospace-custom mb-3" 
+      rows="5" 
+      [(ngModel)]="profileBio"
+      placeholder="Ex: Développeur passionné avec 3 ans d'expérience en Java, Spring Boot et Angular. J'aime le clean code."></textarea>
+
+    <button 
+      type="button" 
+      class="btn-ai-glow px-4" 
+      [disabled]="profileLoading || !profileBio.trim()"
+      (click)="enhanceProfile()">
+      <span *ngIf="profileLoading" class="spinner-border spinner-border-sm me-2"></span>
+      <i *ngIf="!profileLoading" class="bi bi-stars me-2"></i>
+      {{ profileLoading ? 'Optimisation en cours...' : 'Optimiser ma Présentation' }}
+    </button>
+
+    <div *ngIf="profileResult" class="result-box mt-4 p-4 rounded-4 border">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <span class="badge-ai"><i class="bi bi-stars"></i> Profil Restructuré</span>
+        <button class="btn btn-outline-primary btn-sm px-3" (click)="copyToClipboard(profileResult.generatedText)">
+          <i class="bi" [class.bi-clipboard]="!copied" [class.bi-check2]="copied"></i>
+          {{ copied ? 'Copié !' : 'Copier le texte' }}
+        </button>
+      </div>
+      <div class="code-preview-box p-3 rounded-3">
+        <div class="text-light" style="white-space: pre-wrap; line-height: 1.6;">{{ profileResult.generatedText }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== TAB 4 : EXTRACTION DE COMPÉTENCES ==================== -->
+  <div *ngIf="activeTab === 'skills'" class="premium-card p-4 p-md-5">
+    <div class="d-flex align-items-center gap-2 mb-2">
+      <div class="badge-ai"><i class="bi bi-tags"></i> NLP & Reconnaissance d'Entités</div>
+      <span class="count-pill py-0 px-2" style="font-size: 0.68rem;">Universel</span>
+    </div>
+    <h3 class="brand-font fw-extrabold text-white mb-1">Extraction Automatique de Compétences (NLP)</h3>
+    <p class="text-subtle small mb-4">
+      Collez n'importe quel texte brut (CV, fiche de poste, message client) : notre modèle analyse et extrait automatiquement les technologies informatiques détectées.
+    </p>
+
+    <label class="form-label text-light fw-bold small mb-1">Texte brut à analyser</label>
+    <textarea 
+      class="form-control input-premium font-monospace-custom mb-3" 
+      rows="6" 
+      [(ngModel)]="skillText"
+      placeholder="Collez ici un CV ou une offre (ex: Nous recherchons un ingénieur maîtrisant Java 17, Spring Boot, Angular, Docker et les microservices avec une expérience en CI/CD GitLab)..."></textarea>
+
+    <button 
+      type="button" 
+      class="btn-ai-glow px-4" 
+      [disabled]="skillLoading || !skillText.trim()"
+      (click)="extractSkills()">
+      <span *ngIf="skillLoading" class="spinner-border spinner-border-sm me-2"></span>
+      <i *ngIf="!skillLoading" class="bi bi-search me-2"></i>
+      {{ skillLoading ? 'Analyse syntaxique en cours...' : 'Extraire les Technologies' }}
+    </button>
+
+    <div *ngIf="skillResult" class="result-box mt-4 p-4 rounded-4 border">
+      <h6 class="fw-bold text-white mb-3">Technologies Identifiées ({{ skillResult.extractedSkills.length }}) :</h6>
+      <div class="d-flex flex-wrap gap-2 mb-2" *ngIf="skillResult.extractedSkills.length > 0">
+        <span *ngFor="let s of skillResult.extractedSkills" class="tech-tag fs-6 px-3 py-2">
+          <i class="bi bi-check2 text-cyan me-1"></i> {{ s }}
+        </span>
+      </div>
+      <p *ngIf="skillResult.extractedSkills.length === 0" class="text-subtle small mb-0">
+        Aucune compétence informatique reconnue n'a été détectée dans ce texte.
+      </p>
+    </div>
+  </div>
+
+  <!-- ==================== TAB 5 : SMART MATCHING ==================== -->
+  <div *ngIf="activeTab === 'recommendations'" class="premium-card p-4 p-md-5">
+    <div class="d-flex align-items-center gap-2 mb-2">
+      <div class="badge-ai"><i class="bi bi-bullseye"></i> Algorithme de Matching</div>
+      <span class="count-pill py-0 px-2" style="font-size: 0.68rem;">Freelance</span>
+    </div>
+    <h3 class="brand-font fw-extrabold text-white mb-1">Moteur de Recommandation & Smart Matching</h3>
+    <p class="text-subtle small mb-4">
+      Compare en temps réel vos compétences enregistrées avec tous les projets ouverts pour vous recommander les missions où votre compatibilité est maximale.
+    </p>
+
+    <div *ngIf="recoLoading" class="text-center py-5">
+      <div class="spinner-border text-info" role="status"></div>
+      <p class="text-subtle mt-2 small">Calcul des scores de compatibilité en cours...</p>
+    </div>
+
+    <div *ngIf="!recoLoading && recommendations.length === 0" class="empty-box p-5 text-center rounded-4">
+      <i class="bi bi-bullseye text-subtle display-4 mb-2 d-block"></i>
+      <h5 class="fw-bold text-white">Aucune recommandation pour le moment</h5>
+      <p class="text-subtle small mb-3">Renseignez davantage de compétences dans votre bio pour activer le Smart Matching.</p>
+      <a routerLink="/profile" class="btn btn-outline-primary btn-sm">Mettre à jour mon profil</a>
+    </div>
+
+    <div class="d-flex flex-column gap-3" *ngIf="!recoLoading && recommendations.length > 0">
+      <div *ngFor="let rec of recommendations" class="application-card p-4 rounded-4 border">
+        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-start gap-2 mb-2">
+          <div>
+            <h5 class="fw-bold text-white mb-1">{{ rec.projectTitle }}</h5>
+            <small class="text-subtle"><i class="bi bi-building me-1"></i>Client : <strong class="text-white">{{ rec.clientName }}</strong></small>
+          </div>
+          <div class="text-sm-end">
+            <span class="match-score-pill"
+                  [class.high-match]="rec.matchScore >= 70"
+                  [class.mid-match]="rec.matchScore < 70"
+                  style="font-size: 0.88rem;">
+              ✨ {{ rec.matchScore }}% de Compatibilité
+            </span>
+          </div>
+        </div>
+
+        <p class="text-subtle small mb-3">{{ rec.projectDescription }}</p>
+
+        <div class="d-flex flex-wrap gap-1 mb-3">
+          <span class="matched-skill-tag" *ngFor="let s of rec.matchedSkills">
+            ✓ {{ s }}
+          </span>
+          <span class="badge bg-danger-subtle text-danger rounded-pill px-2 py-1 small" *ngFor="let s of rec.missingSkills">
+            ✗ {{ s }} (Manquant)
+          </span>
+        </div>
+
+        <div class="text-end pt-2 border-top">
+          <a routerLink="/projects" class="btn btn-outline-primary btn-sm">
+            Voir l'offre sur la Marketplace →
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

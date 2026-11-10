@@ -1,0 +1,185 @@
+<div class="auth-page-container min-vh-100 d-flex align-items-center justify-content-center p-3 p-md-4">
+  
+  <div class="register-card-wrapper w-100 fade-up" style="max-width: 1040px;">
+    <div class="premium-card p-0 overflow-hidden">
+      
+      <!-- Top Neon Glow Bar -->
+      <div class="card-glow-bar"></div>
+
+      <div class="row g-0 align-items-stretch">
+
+        <!-- ==================== LEFT HERO SHOWCASE ==================== -->
+        <div class="col-lg-5 p-4 p-md-5 d-flex flex-column justify-content-between showcase-panel">
+          
+          <div>
+            <div class="d-flex align-items-center gap-2 mb-4">
+              <div class="mini-logo-box">
+                <i class="bi bi-cpu-fill"></i>
+              </div>
+              <span class="fw-extrabold fs-5 text-white tracking-tight">
+                FreelanceHub<span class="text-gradient">.AI</span>
+              </span>
+            </div>
+
+            <div class="badge-ai mb-3">
+              <span class="pulse-dot"></span> Next-Gen Talent Network
+            </div>
+
+            <h1 class="showcase-title mb-3">
+              Le Futur du <br>
+              <span class="text-gradient">Freelancing IT</span>
+            </h1>
+
+            <p class="showcase-desc mb-4">
+              L'écosystème où l'Intelligence Artificielle optimise chaque étape : rédaction de cahiers des charges, matching sémantique précis et collaboration fluide.
+            </p>
+
+            <!-- Feature Pills -->
+            <div class="d-flex flex-column gap-3 mb-4">
+              <div class="feature-item d-flex align-items-center gap-3">
+                <div class="feature-icon-box text-cyan">
+                  <i class="bi bi-magic fs-5"></i>
+                </div>
+                <div>
+                  <div class="fw-bold text-white small">Assistant Rédaction IA</div>
+                  <div class="text-subtle" style="font-size: 0.78rem;">Génération instantanée de projets et propositions</div>
+                </div>
+              </div>
+
+              <div class="feature-item d-flex align-items-center gap-3">
+                <div class="feature-icon-box text-magenta">
+                  <i class="bi bi-bullseye fs-5"></i>
+                </div>
+                <div>
+                  <div class="fw-bold text-white small">Smart Matching Précis</div>
+                  <div class="text-subtle" style="font-size: 0.78rem;">Algorithme NLP basé sur votre stack technologique</div>
+                </div>
+              </div>
+
+              <div class="feature-item d-flex align-items-center gap-3">
+                <div class="feature-icon-box text-violet">
+                  <i class="bi bi-shield-lock-fill fs-5"></i>
+                </div>
+                <div>
+                  <div class="fw-bold text-white small">Sécurité & Confiance</div>
+                  <div class="text-subtle" style="font-size: 0.78rem;">Authentification JWT et profils vérifiés</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Metric Pill -->
+          <div class="metric-glass-pill d-flex align-items-center gap-3 p-3 rounded-4">
+            <div class="sphere-3d-glow" style="width: 44px; height: 44px;"></div>
+            <div>
+              <div class="fw-extrabold text-white fs-6">98.4% de Matching</div>
+              <div class="text-subtle" style="font-size: 0.72rem;">Satisfaction certifiée sur les missions IT</div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ==================== RIGHT FORM ==================== -->
+        <div class="col-lg-7 p-4 p-md-5 d-flex flex-column justify-content-center form-panel">
+          
+          <div class="mb-4">
+            <h3 class="brand-font fw-extrabold text-white mb-1">Créer un Compte</h3>
+            <p class="text-subtle small mb-0">Rejoignez la communauté en quelques instants.</p>
+          </div>
+
+          <!-- Error Alert -->
+          <div class="alert alert-danger border-0 rounded-3 small mb-3 d-flex align-items-center" *ngIf="error">
+            <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+            <span>{{ error }}</span>
+          </div>
+
+          <form (ngSubmit)="onSubmit()">
+            
+            <!-- Role Selection Cards -->
+            <div class="mb-4">
+              <label class="form-label text-light fw-bold small mb-2">Je souhaite m'inscrire en tant que :</label>
+              <div class="row g-2">
+                <div class="col-6">
+                  <button type="button"
+                          class="role-select-card w-100 p-3 text-start transition-all"
+                          [class.active-role]="roleName === 'CLIENT'"
+                          (click)="roleName = 'CLIENT'">
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                      <span class="role-emoji">🏢</span>
+                      <i class="bi bi-check-circle-fill text-magenta" *ngIf="roleName === 'CLIENT'"></i>
+                    </div>
+                    <div class="fw-bold text-white small">Porteur de Projet</div>
+                    <div class="role-desc">Publier des missions & recruter</div>
+                  </button>
+                </div>
+
+                <div class="col-6">
+                  <button type="button"
+                          class="role-select-card w-100 p-3 text-start transition-all"
+                          [class.active-role]="roleName === 'FREELANCE'"
+                          (click)="roleName = 'FREELANCE'">
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                      <span class="role-emoji">💻</span>
+                      <i class="bi bi-check-circle-fill text-cyan" *ngIf="roleName === 'FREELANCE'"></i>
+                    </div>
+                    <div class="fw-bold text-white small">Freelance Tech</div>
+                    <div class="role-desc">Postuler & développer</div>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Firstname & Lastname -->
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label text-light fw-bold small mb-1">Prénom</label>
+                <input class="form-control input-premium"
+                       [(ngModel)]="firstname" name="firstname" required placeholder="ex: Karim">
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label text-light fw-bold small mb-1">Nom</label>
+                <input class="form-control input-premium"
+                       [(ngModel)]="lastname" name="lastname" required placeholder="ex: Benali">
+              </div>
+            </div>
+
+            <!-- Email -->
+            <div class="mb-3">
+              <label class="form-label text-light fw-bold small mb-1">Adresse Email Pro</label>
+              <input class="form-control input-premium"
+                     type="email" [(ngModel)]="email" name="email" required placeholder="karim@tech.com">
+            </div>
+
+            <!-- Password -->
+            <div class="mb-4">
+              <label class="form-label text-light fw-bold small mb-1">Mot de passe</label>
+              <input class="form-control input-premium"
+                     type="password" [(ngModel)]="password" name="password" required placeholder="Au moins 6 caractères">
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn-ai-glow w-100 py-3" [disabled]="loading || !email || !password || !firstname">
+              <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+              <span *ngIf="!loading">
+                Finaliser l'Inscription <i class="bi bi-arrow-right ms-2"></i>
+              </span>
+              <span *ngIf="loading">Création de l'Espace...</span>
+            </button>
+          </form>
+
+          <!-- Back to Login -->
+          <div class="text-center mt-4 pt-3 border-top">
+            <span class="text-muted small">Vous possédez déjà un compte ?</span>
+            <a routerLink="/login" class="text-gradient fw-bold text-decoration-none ms-1 small">
+              Se connecter <i class="bi bi-chevron-right"></i>
+            </a>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>

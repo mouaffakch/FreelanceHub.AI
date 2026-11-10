@@ -1,0 +1,163 @@
+<app-navbar></app-navbar>
+
+<div class="container py-4 fade-up" style="max-width: 1200px;">
+
+  <!-- Hero Header -->
+  <div class="hero-section text-center py-4 mb-4">
+    <div class="d-inline-flex align-items-center gap-2 mb-2">
+      <span class="badge-ai py-1 px-3">
+        <i class="bi bi-stars text-warning me-1"></i> Réseau d'Experts Certifiés
+      </span>
+    </div>
+    <h2 class="brand-font fw-extrabold text-white mb-2 fs-1">
+      Explorez les Meilleurs <span class="text-gradient">Talents IT & IA</span>
+    </h2>
+    <p class="text-subtle small mb-4" style="max-width: 620px; margin: 0 auto;">
+      Trouvez l'ingénieur idéal pour vos projets web, mobile, cloud et data. Évaluations certifiées par smart contracts et paiements garantis sous séquestre.
+    </p>
+
+    <!-- Search & Filter Bar -->
+    <div class="search-filter-card p-3 p-md-4 rounded-4 mb-3 border mx-auto" style="max-width: 980px;">
+      <div class="row g-2 align-items-center">
+        
+        <!-- Search Input -->
+        <div class="col-12 col-md-5">
+          <div class="input-with-icon">
+            <i class="bi bi-search input-icon"></i>
+            <input
+              type="text"
+              class="form-control input-premium ps-5"
+              [(ngModel)]="searchTerm"
+              placeholder="Rechercher par nom, expertise, bio...">
+          </div>
+        </div>
+
+        <!-- Skill Filter -->
+        <div class="col-6 col-md-4">
+          <select class="form-select input-premium" [(ngModel)]="selectedSkill">
+            <option value="ALL">Toutes les technologies</option>
+            <option *ngFor="let s of availableSkills" [value]="s">{{ s }}</option>
+          </select>
+        </div>
+
+        <!-- Rating Filter -->
+        <div class="col-6 col-md-3">
+          <select class="form-select input-premium" [(ngModel)]="minRating">
+            <option [ngValue]="0">Toutes les notes</option>
+            <option [ngValue]="4.5">⭐ 4.5 et plus</option>
+            <option [ngValue]="5.0">⭐ 5.0 (Excellence)</option>
+          </select>
+        </div>
+
+      </div>
+
+      <!-- Quick Skill Badges -->
+      <div class="d-flex align-items-center gap-2 flex-wrap mt-3 pt-2 border-top border-white-10">
+        <span class="text-subtle small me-1" style="font-size: 0.75rem;">Filtres rapides :</span>
+        <button
+          type="button"
+          class="badge-filter-pill"
+          [class.active]="selectedSkill === 'ALL'"
+          (click)="selectedSkill = 'ALL'">
+          Tous
+        </button>
+        <button
+          *ngFor="let sk of availableSkills.slice(0, 5)"
+          type="button"
+          class="badge-filter-pill"
+          [class.active]="selectedSkill === sk"
+          (click)="selectedSkill = sk">
+          {{ sk }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-info" role="status" style="width: 3rem; height: 3rem;"></div>
+    <p class="text-subtle mt-3 small">Chargement des profils d'experts...</p>
+  </div>
+
+  <!-- Error Alert -->
+  <div *ngIf="error" class="alert alert-danger border-0 rounded-4 mb-4">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ error }}
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && filteredFreelancers.length === 0" class="empty-box p-5 text-center rounded-4">
+    <i class="bi bi-people text-subtle display-4 mb-3 d-block"></i>
+    <h5 class="text-white fw-bold mb-1">Aucun freelance trouvé</h5>
+    <p class="text-subtle small mb-0">Essayez d'ajuster vos critères de recherche ou de réinitialiser les filtres.</p>
+  </div>
+
+  <!-- Freelancers Grid -->
+  <div class="row g-4" *ngIf="!loading && filteredFreelancers.length > 0">
+    <div *ngFor="let f of filteredFreelancers" class="col-12 col-md-6 col-lg-4">
+      
+      <div class="talent-card premium-card p-4 rounded-4 h-100 d-flex flex-column justify-content-between position-relative">
+        <div class="card-glow-bar"></div>
+
+        <div>
+          <!-- Header: Avatar, Name & Rating -->
+          <div class="d-flex align-items-start gap-3 mb-3">
+            <div class="avatar-holo-ring flex-shrink-0" style="width: 54px; height: 54px;">
+              <div class="avatar-inner" style="font-size: 1.25rem;">
+                {{ f.firstname?.charAt(0) || 'F' }}
+              </div>
+            </div>
+
+            <div class="flex-grow-1 overflow-hidden">
+              <div class="d-flex align-items-center gap-1 mb-1">
+                <h5 class="text-white fw-bold mb-0 text-truncate">
+                  {{ f.firstname }} {{ f.lastname }}
+                </h5>
+                <i class="bi bi-patch-check-fill text-info small" title="Profil Vérifié"></i>
+              </div>
+
+              <!-- Rating Stars -->
+              <div class="d-flex align-items-center gap-1 small text-warning">
+                <i *ngFor="let s of getStars(ratingsMap[f.id]?.avg || 5)" class="bi bi-star-fill"></i>
+                <span class="text-white fw-bold ms-1">
+                  {{ (ratingsMap[f.id]?.avg || 5.0) | number:'1.1-1' }}
+                </span>
+                <span class="text-subtle" style="font-size: 0.72rem;">
+                  ({{ ratingsMap[f.id]?.count || 0 }} avis)
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bio -->
+          <p class="text-subtle small mb-3 talent-bio" style="font-size: 0.84rem; line-height: 1.5;">
+            {{ f.bio || 'Ingénieur logiciel passionné par le développement d\'applications robustes et performantes.' }}
+          </p>
+
+          <!-- Skills tags -->
+          <div class="d-flex flex-wrap gap-1 mb-3">
+            <span *ngFor="let skill of (f.skills || []).slice(0, 4)" class="skill-tag-pill">
+              {{ skill }}
+            </span>
+            <span *ngIf="(f.skills || []).length > 4" class="skill-tag-pill text-muted">
+              +{{ f.skills.length - 4 }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="pt-3 border-top border-white-10 d-flex align-items-center gap-2">
+          <a [routerLink]="['/profile', f.id]" class="btn btn-outline-info btn-sm flex-grow-1 py-2">
+            <i class="bi bi-person-badge me-1"></i> Voir Profil
+          </a>
+          <a [routerLink]="['/chat', f.id]" class="btn btn-outline-primary btn-sm px-3 py-2" title="Envoyer un message">
+            <i class="bi bi-chat-dots-fill"></i>
+          </a>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+</div>

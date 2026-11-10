@@ -1,0 +1,97 @@
+.auth-page-container {
+  position: relative;
+  z-index: 10;
+  background: radial-gradient(circle at 50% 30%, rgba(99, 102, 241, 0.08) 0%, transparent 60%);
+}
+
+.showcase-panel {
+  background: linear-gradient(145deg, rgba(99, 102, 241, 0.08) 0%, rgba(139, 92, 246, 0.1) 50%, rgba(6, 182, 212, 0.05) 100%);
+  border-right: 1px solid var(--border-glass);
+}
+
+.mini-logo-box {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-xs);
+  background: var(--gradient-brand);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
+}
+
+.showcase-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 2.1rem;
+  line-height: 1.15;
+  color: #FFFFFF;
+  letter-spacing: -0.03em;
+}
+
+.showcase-desc {
+  color: var(--text-subtle);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.feature-icon-box {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-glass-bright);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  &.text-cyan { color: #22D3EE; border-color: rgba(6, 182, 212, 0.3); }
+  &.text-magenta { color: #F43F5E; border-color: rgba(244, 63, 94, 0.3); }
+  &.text-violet { color: #818CF8; border-color: rgba(99, 102, 241, 0.3); }
+}
+
+.metric-glass-pill {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-glass-bright);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+/* Role Selector Cards */
+.role-select-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.18);
+    transform: translateY(-2px);
+  }
+
+  &.active-role {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.16), rgba(139, 92, 246, 0.12));
+    border-color: #6366F1;
+    box-shadow: 0 4px 18px rgba(99, 102, 241, 0.25);
+
+    .role-desc {
+      color: #E2E8F0;
+    }
+  }
+}
+
+.role-emoji {
+  font-size: 1.4rem;
+}
+
+.role-desc {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.text-subtle {
+  color: var(--text-subtle);
+}

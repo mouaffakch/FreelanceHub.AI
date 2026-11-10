@@ -1,0 +1,202 @@
+<app-navbar></app-navbar>
+
+<div class="container py-4 fade-up" style="max-width: 960px;">
+
+  <!-- Header -->
+  <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4">
+    <div>
+      <div class="badge-ai mb-2">
+        <i class="bi bi-stars"></i> Workspace Client & Product Owner
+      </div>
+      <h1 class="brand-font fw-extrabold text-white mb-1">
+        {{ isEdit ? 'Modifier la Mission' : 'Publier une Nouvelle Mission' }}
+      </h1>
+      <p class="text-subtle small mb-0">Rédigez vous-même votre besoin ou laissez l'IA concevoir le cahier des charges complet.</p>
+    </div>
+    <a routerLink="/client" class="btn btn-outline-secondary btn-sm px-3 align-self-start align-self-sm-center">
+      <i class="bi bi-arrow-left me-1"></i> Cockpit Projets
+    </a>
+  </div>
+
+  <!-- ==================== BANDEAU ASSISTANT IA ==================== -->
+  <div class="ai-generator-panel premium-card p-4 mb-4" *ngIf="!isEdit">
+    
+    <div class="d-flex align-items-center gap-2 mb-2">
+      <div class="ai-badge-icon">
+        <i class="bi bi-magic fs-6"></i>
+      </div>
+      <h5 class="fw-bold text-white mb-0">Générateur de Cahier des Charges par IA</h5>
+      <span class="badge-ai ms-auto py-1 px-2" style="font-size: 0.68rem;">Recommandé</span>
+    </div>
+    
+    <p class="text-subtle small mb-3">
+      Indiquez une idée brute (ex: <em>"Application mobile Flutter de livraison bio avec géolocalisation et Stripe"</em>). L'IA rédige automatiquement le titre professionnel, les spécifications techniques, le budget estimé et coche les compétences.
+    </p>
+
+    <!-- Prompt Bar -->
+    <div class="d-flex flex-column flex-sm-row gap-2 mb-3">
+      <div class="flex-grow-1 position-relative">
+        <input 
+          type="text" 
+          class="form-control input-premium" 
+          [(ngModel)]="aiPrompt" 
+          placeholder="Décrivez votre idée en une phrase simple..."
+          (keydown.enter)="$event.preventDefault(); generateWithAI()">
+      </div>
+      <button 
+        type="button" 
+        class="btn-ai-glow px-4 text-nowrap" 
+        [disabled]="aiGenerating || !aiPrompt.trim()"
+        (click)="generateWithAI()">
+        <span *ngIf="aiGenerating" class="spinner-border spinner-border-sm me-2"></span>
+        <i *ngIf="!aiGenerating" class="bi bi-stars me-1"></i>
+        {{ aiGenerating ? 'Génération en cours...' : 'Générer avec l\'IA' }}
+      </button>
+    </div>
+
+    <!-- Quick Prompts -->
+    <div class="d-flex flex-wrap align-items-center gap-2">
+      <small class="text-muted fw-bold">Idées rapides :</small>
+      <button type="button" class="quick-prompt-btn" 
+              (click)="aiPrompt = 'Plateforme SaaS B2B de gestion des congés avec dashboard Angular et Spring Boot'">
+        🏢 SaaS RH Angular/Spring
+      </button>
+      <button type="button" class="quick-prompt-btn" 
+              (click)="aiPrompt = 'Application mobile de commerce connecté Flutter avec catalogue hors-ligne et paiements Stripe'">
+        📱 App Mobile Flutter E-Commerce
+      </button>
+      <button type="button" class="quick-prompt-btn" 
+              (click)="aiPrompt = 'Pipeline ETL de détection de fraudes bancaires en temps réel avec Python et Docker'">
+        🤖 Pipeline Data & Machine Learning
+      </button>
+    </div>
+
+    <div *ngIf="aiError" class="alert alert-danger border-0 rounded-3 small mt-3 mb-0">
+      <i class="bi bi-exclamation-triangle-fill me-1"></i>{{ aiError }}
+    </div>
+
+    <div *ngIf="aiGenerated" class="ai-success-toast p-3 rounded-3 mt-3 d-flex align-items-center justify-content-between">
+      <span class="d-flex align-items-center gap-2 small text-white">
+        <i class="bi bi-check-circle-fill text-success fs-5"></i>
+        Le formulaire a été automatiquement configuré avec les spécifications professionnelles de l'IA !
+      </span>
+      <span class="badge bg-success-subtle text-success small">Complété</span>
+    </div>
+  </div>
+
+  <!-- Messages d'erreur et succès -->
+  <div *ngIf="error" class="alert alert-danger border-0 rounded-3 small mb-4">
+    <i class="bi bi-exclamation-circle-fill me-2"></i>{{ error }}
+  </div>
+  <div *ngIf="success" class="alert alert-success border-0 rounded-3 small mb-4">
+    <i class="bi bi-check-circle-fill me-2"></i>{{ success }}
+  </div>
+
+  <!-- ==================== FORMULAIRE PROJET ==================== -->
+  <form (ngSubmit)="onSubmit()" class="premium-card p-4 p-md-5">
+
+    <!-- Titre -->
+    <div class="mb-4">
+      <label class="form-label fw-bold text-light small mb-1">
+        Titre de la Mission IT <span class="text-danger">*</span>
+      </label>
+      <input 
+        type="text" 
+        class="form-control input-premium fs-6" 
+        [(ngModel)]="title" 
+        name="title" 
+        required 
+        placeholder="ex: Développement Plateforme SaaS B2B Angular & Spring Boot">
+    </div>
+
+    <!-- Description -->
+    <div class="mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-1">
+        <label class="form-label fw-bold text-light small mb-0">
+          Cahier des Charges & Description Technique <span class="text-danger">*</span>
+        </label>
+        <span class="text-muted small">Syntaxe Markdown supportée</span>
+      </div>
+      <textarea 
+        class="form-control input-premium font-monospace-custom" 
+        rows="10" 
+        [(ngModel)]="description" 
+        name="description" 
+        required 
+        placeholder="Décrivez les fonctionnalités attendues, les livrables, l'architecture et les contraintes..."></textarea>
+    </div>
+
+    <!-- Budget & Deadline -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-6">
+        <label class="form-label fw-bold text-light small mb-1">
+          Budget Alloué (€) <span class="text-danger">*</span>
+        </label>
+        <div class="position-relative">
+          <input 
+            type="number" 
+            class="form-control input-premium ps-5" 
+            [(ngModel)]="budget" 
+            name="budget" 
+            min="100" 
+            required>
+          <span class="currency-symbol">€</span>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label fw-bold text-light small mb-1">
+          Date Limite de Livraison Souhaitée
+        </label>
+        <input 
+          type="date" 
+          class="form-control input-premium" 
+          [(ngModel)]="deadline" 
+          name="deadline">
+      </div>
+    </div>
+
+    <!-- Compétences Techniques Requises -->
+    <div class="mb-4" *ngIf="availableSkills.length > 0">
+      <label class="form-label fw-bold text-light small mb-2">
+        Compétences & Technologies Requises (Sélectionnez les tags)
+      </label>
+      <div class="d-flex flex-wrap gap-2">
+        <button 
+          *ngFor="let s of availableSkills" 
+          type="button" 
+          class="skill-select-pill"
+          [class.active-skill]="isSkillSelected(s.id)"
+          (click)="toggleSkill(s.id)">
+          <i class="bi bi-check2" *ngIf="isSkillSelected(s.id)"></i>
+          {{ s.name }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Statut (en édition) -->
+    <div class="mb-4" *ngIf="isEdit">
+      <label class="form-label fw-bold text-light small mb-1">Statut du Projet</label>
+      <select class="form-select input-premium" [(ngModel)]="status" name="status">
+        <option value="OPEN">🟢 OPEN (Ouvert aux candidatures)</option>
+        <option value="IN_PROGRESS">🟡 IN_PROGRESS (Mission en cours)</option>
+        <option value="CLOSED">⚪ CLOSED (Projet clôturé)</option>
+      </select>
+    </div>
+
+    <!-- Boutons d'Action -->
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-3 pt-3 border-top">
+      <button type="button" class="btn btn-outline-secondary px-4 order-2 order-sm-1" (click)="onCancel()">
+        Annuler
+      </button>
+
+      <button type="submit" class="btn-ai-glow px-5 py-3 order-1 order-sm-2" [disabled]="loading || !title.trim() || !description.trim()">
+        <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+        <i *ngIf="!loading" class="bi bi-check2-circle me-2"></i>
+        {{ loading ? 'Enregistrement...' : (isEdit ? 'Mettre à jour la Mission' : '🚀 Publier la Mission IT') }}
+      </button>
+    </div>
+
+  </form>
+
+</div>

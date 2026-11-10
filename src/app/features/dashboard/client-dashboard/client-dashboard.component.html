@@ -1,0 +1,901 @@
+<app-navbar></app-navbar>
+
+<div class="container py-4 fade-up">
+  
+  <!-- ==================== HEADER CLIENT ==================== -->
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div>
+      <div class="badge-ai mb-2">
+        <i class="bi bi-briefcase-fill"></i> Espace Porteur de Projet
+      </div>
+      <h1 class="brand-font fw-extrabold text-white mb-1">
+        Cockpit Client & <span class="text-gradient">Supervision</span>
+      </h1>
+      <p class="text-subtle small mb-0">Pilotez vos missions IT, sécurisez les paiements sous séquestre et évaluez les freelances.</p>
+    </div>
+    <div class="d-flex gap-2">
+      <a routerLink="/project-form" class="btn-ai-glow">
+        <i class="bi bi-plus-lg me-1"></i> Nouveau Projet IA
+      </a>
+    </div>
+  </div>
+
+  <!-- Messages Flash -->
+  <div *ngIf="error" class="alert alert-danger border-0 rounded-4 shadow-sm mb-4 d-flex align-items-center">
+    <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+    <span>{{ error }}</span>
+  </div>
+  <div *ngIf="successMsg" class="alert alert-success border-0 rounded-4 shadow-sm mb-4 d-flex align-items-center">
+    <i class="bi bi-check-circle-fill me-2 fs-5"></i>
+    <span>{{ successMsg }}</span>
+  </div>
+
+  <!-- ==================== KPI STATS CARDS ==================== -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-4">
+      <div class="kpi-card premium-card p-4 text-center">
+        <div class="kpi-icon-box text-violet mb-2">
+          <i class="bi bi-folder2-open fs-4"></i>
+        </div>
+        <h3 class="kpi-num mb-0">{{ totalProjects }}</h3>
+        <p class="text-subtle small mb-0 fw-semibold">Projets Publiés</p>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="kpi-card premium-card p-4 text-center">
+        <div class="kpi-icon-box text-amber mb-2">
+          <i class="bi bi-gear-wide-connected fs-4"></i>
+        </div>
+        <h3 class="kpi-num mb-0">{{ inProgressCount }}</h3>
+        <p class="text-subtle small mb-0 fw-semibold">En Cours de Réalisation</p>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="kpi-card premium-card p-4 text-center">
+        <div class="kpi-icon-box text-cyan mb-2">
+          <i class="bi bi-shield-lock-fill fs-4"></i>
+        </div>
+        <h3 class="kpi-num mb-0">{{ applications.length }}</h3>
+        <p class="text-subtle small mb-0 fw-semibold">Candidatures sur ce Projet</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== GRILLE PRINCIPALE ==================== -->
+  <div class="row g-4">
+    
+    <!-- COLONNE GAUCHE : MES PROJETS -->
+    <div class="col-lg-5">
+      <div class="premium-card p-4 h-100">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold text-white mb-0">Mes Projets IT</h5>
+          <span class="count-pill py-1 px-3" style="font-size: 0.75rem;">{{ projects.length }}</span>
+        </div>
+
+        <div *ngIf="loadingProjects" class="text-center py-4">
+          <div class="spinner-border spinner-border-sm text-info" role="status"></div>
+          <span class="text-subtle ms-2 small">Chargement des missions...</span>
+        </div>
+
+        <div *ngIf="!loadingProjects && projects.length === 0" class="text-center py-5 empty-box rounded-4">
+          <i class="bi bi-folder-plus text-subtle display-4 mb-2 d-block"></i>
+          <h6 class="fw-bold text-white">Aucun projet publié</h6>
+          <p class="text-subtle small mb-3">Publiez votre première mission assistée par IA.</p>
+          <a routerLink="/project-form" class="btn-ai-glow btn-sm">Publier un projet</a>
+        </div>
+
+        <div class="d-flex flex-column gap-3" *ngIf="!loadingProjects && projects.length > 0">
+          <div *ngFor="let p of projects" 
+               class="project-sidebar-item p-3 rounded-3 cursor-pointer transition-all"
+               [class.active-item]="selectedProject?.id === p.id"
+               (click)="selectProject(p)">
+            
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <span class="badge-status-pill"
+                    [class.status-open]="p.status === 'OPEN'"
+                    [class.status-progress]="p.status === 'IN_PROGRESS'"
+                    [class.status-closed]="p.status === 'CLOSED'">
+                <span class="status-dot"></span>
+                {{ p.status }}
+              </span>
+              <span class="budget-mini">{{ p.budget | number }} €</span>
+            </div>
+
+            <h6 class="fw-bold text-white mb-1" style="font-size: 0.95rem;">{{ p.title }}</h6>
+            <div class="text-subtle small d-flex align-items-center justify-content-between mt-2">
+              <span><i class="bi bi-clock me-1"></i>{{ p.deadline ? (p.deadline | date:'dd/MM/yyyy') : 'Ouvert' }}</span>
+              <div class="d-flex gap-1" (click)="$event.stopPropagation()">
+                <a [routerLink]="['/project-form', p.id]" class="btn-icon-action" title="Modifier">
+                  <i class="bi bi-pencil-square"></i>
+                </a>
+                <button type="button" class="btn-icon-action text-danger" (click)="confirmDelete(p.id)" title="Supprimer">
+                  <i class="bi bi-trash3"></i>
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- COLONNE DROITE : DÉTAILS DU PROJET ET SÉQUESTRE/NOTATION -->
+    <div class="col-lg-7">
+      
+      <!-- Si aucun projet sélectionné -->
+      <div *ngIf="!selectedProject" class="premium-card p-5 text-center h-100 d-flex flex-column align-items-center justify-content-center">
+        <i class="bi bi-cursor-fill text-subtle fs-1 mb-3"></i>
+        <h5 class="fw-bold text-white">Sélectionnez une mission à gauche</h5>
+        <p class="text-subtle small mb-0">Consultez les détails, gérez les fonds sous séquestre et notez les livrables.</p>
+      </div>
+
+      <!-- Détail du projet actif -->
+      <div *ngIf="selectedProject" class="premium-card p-4 p-md-5 h-100 d-flex flex-column justify-content-between">
+        
+        <div>
+          <!-- Header Détail -->
+          <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-start gap-2 mb-3 pb-3 border-bottom">
+            <div>
+              <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge-status-pill"
+                      [class.status-open]="selectedProject.status === 'OPEN'"
+                      [class.status-progress]="selectedProject.status === 'IN_PROGRESS'"
+                      [class.status-closed]="selectedProject.status === 'CLOSED'">
+                  <span class="status-dot"></span>
+                  {{ selectedProject.status }}
+                </span>
+                <span class="badge-ai py-0 px-2" style="font-size: 0.65rem;">Mission active</span>
+              </div>
+              <h4 class="brand-font fw-extrabold text-white mb-1">{{ selectedProject.title }}</h4>
+            </div>
+
+            <div class="text-sm-end">
+              <div class="project-budget fs-4">{{ selectedProject.budget | number }} €</div>
+              <small class="text-subtle">Budget alloué</small>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="mb-4">
+            <h6 class="text-subtle small fw-bold text-uppercase mb-2">Cahier des Charges</h6>
+            <div class="detail-description-box p-3 rounded-3 small">
+              {{ selectedProject.description }}
+            </div>
+          </div>
+
+          <!-- Livrables soumis par le freelance -->
+          <div *ngIf="selectedProject.deliverablesUrl" class="deliverables-panel p-3 p-md-4 rounded-4 mb-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+              <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 rounded-pill small">
+                  <i class="bi bi-box-seam-fill me-1"></i> Livrables Reçus
+                </span>
+                <span class="text-subtle small" *ngIf="selectedProject.deliveredAt">
+                  Soumis le {{ selectedProject.deliveredAt | date:'dd/MM/yyyy à HH:mm' }}
+                </span>
+              </div>
+              <a [href]="selectedProject.deliverablesUrl" target="_blank" class="btn btn-outline-info btn-sm">
+                <i class="bi bi-box-arrow-up-right me-1"></i> Ouvrir le Lien des Livrables
+              </a>
+            </div>
+            <div class="mb-2">
+              <span class="text-subtle small fw-bold">Dépôt / Lien :</span>
+              <div class="mt-1">
+                <a [href]="selectedProject.deliverablesUrl" target="_blank" class="text-cyan text-break fw-semibold">
+                  <i class="bi bi-link-45deg me-1"></i>{{ selectedProject.deliverablesUrl }}
+                </a>
+              </div>
+            </div>
+            <div *ngIf="selectedProject.deliverablesNotes">
+              <span class="text-subtle small fw-bold">Notes de livraison du freelance :</span>
+              <div class="text-white small mt-1 p-2 rounded-2" style="background: rgba(255,255,255,0.04); border-left: 3px solid var(--neon-cyan);">
+                "{{ selectedProject.deliverablesNotes }}"
+              </div>
+            </div>
+          </div>
+
+          <!-- ==================== PANNEAU SÉCURITÉ FINANCIÈRE / ESCROW ==================== -->
+          
+          <!-- Cas 1 : Fonds déjà sous séquestre (HELD_IN_ESCROW) -->
+          <div *ngIf="projectPayment && projectPayment.status === 'HELD_IN_ESCROW'" 
+               class="escrow-panel escrow-held p-3 p-md-4 rounded-4 mb-4">
+            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-2">
+              <div class="d-flex align-items-center gap-2">
+                <span class="escrow-status-tag tag-held">
+                  <i class="bi bi-shield-lock-fill"></i> Fonds Sécurisés sous Séquestre
+                </span>
+                <span class="badge-ai py-0 px-2" style="font-size: 0.65rem;">Escrow FreelanceHub</span>
+              </div>
+              <small class="text-subtle font-monospace">Réf: {{ projectPayment.transactionRef }}</small>
+            </div>
+
+            <p class="text-white small mb-3">
+              Le montant de <strong class="text-gradient fs-6">{{ projectPayment.amount | number }} €</strong> est consigné et verrouillé en toute sécurité. Le freelance a la garantie d'être payé dès que vous inspectez et validez ses livrables.
+            </p>
+
+            <div class="financial-pill-box p-3 mb-3 d-flex flex-wrap justify-content-between align-items-center gap-2 small">
+              <div>
+                <span class="text-subtle d-block" style="font-size: 0.72rem;">NET REVERSÉ AU FREELANCE</span>
+                <strong class="text-emerald fs-6">{{ projectPayment.netAmount | number }} € (90%)</strong>
+              </div>
+              <div class="text-sm-end">
+                <span class="text-subtle d-block" style="font-size: 0.72rem;">COMMISSION PLATEFORME</span>
+                <span class="text-white fw-bold">{{ projectPayment.platformFee | number }} € (10%)</span>
+              </div>
+            </div>
+
+            <div class="d-flex flex-wrap gap-2 pt-1 border-top border-white-10">
+              <button class="btn btn-warning fw-bold btn-sm rounded-3 text-dark px-3 py-2" (click)="openCompleteModal()">
+                ⭐ Valider, Noter & Débloquer les Fonds
+              </button>
+              <button class="btn btn-outline-light btn-sm rounded-3 px-3 py-2" (click)="openInvoiceModal()">
+                <i class="bi bi-receipt me-1"></i> Facture / Reçu Escrow
+              </button>
+              <button class="btn btn-outline-danger btn-sm rounded-3 px-3 py-2 ms-auto" (click)="openDisputeModal()">
+                <i class="bi bi-shield-exclamation me-1"></i> Signaler un Litige
+              </button>
+            </div>
+          </div>
+
+          <!-- Cas 2 : Litige ouvert (DISPUTED) -->
+          <div *ngIf="projectPayment && projectPayment.status === 'DISPUTED'" 
+               class="escrow-panel escrow-disputed p-3 p-md-4 rounded-4 mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="escrow-status-tag tag-disputed">
+                <i class="bi bi-exclamation-octagon-fill"></i> Contrat en Litige — Arbitrage en Cours
+              </span>
+              <span class="badge bg-danger-subtle text-danger small">Fonds Gelés</span>
+            </div>
+            <p class="text-white small mb-2">
+              <strong>Motif du désaccord :</strong> "{{ projectPayment.disputeReason }}"
+            </p>
+            <p class="text-subtle small mb-0" style="font-size: 0.8rem;">
+              Les fonds de <strong>{{ projectPayment.amount | number }} €</strong> restent consignés sous séquestre. L'équipe d'administration examine actuellement les livrables pour rendre sa décision arbitrale.
+            </p>
+          </div>
+
+          <!-- Cas 3 : Projet en cours ou retenu, mais fonds pas encore consignés -->
+          <div *ngIf="(!projectPayment || projectPayment.status === 'PENDING') && selectedProject.status !== 'CLOSED' && hasAcceptedFreelance()" 
+               class="escrow-panel p-3 p-md-4 rounded-4 mb-4">
+            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-2">
+              <span class="escrow-status-tag tag-pending">
+                <i class="bi bi-credit-card-2-front"></i> Étape Requise : Consignation du Paiement
+              </span>
+              <span class="text-subtle small">Freelance prêt à développer</span>
+            </div>
+            <p class="text-white small mb-3">
+              Vous avez retenu <strong class="text-cyan">{{ getAcceptedFreelanceName() }}</strong>. Pour démarrer les développements en toute confiance mutuelle, consignez le budget de <strong>{{ selectedProject.budget | number }} €</strong> sous séquestre.
+            </p>
+            <button class="btn-ai-glow btn-sm px-4" (click)="openDepositModal()">
+              <i class="bi bi-lock-fill me-1"></i> Consigner les Fonds sous Séquestre (Stripe Test)
+            </button>
+          </div>
+
+          <!-- Cas 4 : Projet Clôturé (CLOSED) avec Affichage de l'Évaluation et Étoiles -->
+          <div *ngIf="selectedProject.status === 'CLOSED'" class="mb-4">
+            
+            <!-- Carte Avis & Note 5 Étoiles -->
+            <div *ngIf="projectReview" class="review-display-card p-4 rounded-4 mb-3">
+              <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="badge-ai py-1 px-2" style="font-size: 0.7rem;">
+                    <i class="bi bi-trophy-fill text-warning me-1"></i> Mission Achevée & Évaluée
+                  </span>
+                  <strong class="text-white small">Avis Client Enregistré</strong>
+                </div>
+                <span class="text-subtle small" *ngIf="projectReview.createdAt">
+                  {{ projectReview.createdAt | date:'dd/MM/yyyy' }}
+                </span>
+              </div>
+
+              <!-- Étoiles dorées interactives / affichées -->
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <div class="text-warning fs-5">
+                  <i *ngFor="let s of getStarsArray(projectReview.rating)" class="bi bi-star-fill me-1" style="text-shadow: 0 0 10px rgba(251,191,36,0.5);"></i>
+                  <i *ngFor="let s of getStarsArray(5 - projectReview.rating)" class="bi bi-star me-1 text-muted"></i>
+                </div>
+                <span class="fw-bold text-white small">({{ projectReview.rating }} / 5)</span>
+              </div>
+
+              <!-- Commentaire écrit -->
+              <p class="text-light small mb-0 fst-italic">
+                "{{ projectReview.comment }}"
+              </p>
+            </div>
+
+            <!-- Preuve de Paiement Libéré -->
+            <div *ngIf="projectPayment && projectPayment.status === 'RELEASED'" 
+                 class="escrow-panel escrow-released p-3 rounded-3 d-flex flex-wrap justify-content-between align-items-center gap-2 small">
+              <span class="text-white">
+                <i class="bi bi-check-circle-fill text-success me-1"></i>
+                Paiement de <strong>{{ projectPayment.netAmount | number }} €</strong> débloqué pour {{ projectPayment.freelanceName || 'le freelance' }}
+              </span>
+              <div class="d-flex align-items-center gap-2">
+                <button class="btn btn-outline-light btn-sm rounded-3 px-3 py-1" (click)="openInvoiceModal()">
+                  <i class="bi bi-receipt me-1"></i> Facture & Reçu
+                </button>
+                <span class="text-subtle font-monospace" style="font-size: 0.75rem;">
+                  Réf: {{ projectPayment.transactionRef }}
+                </span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- SECTION CANDIDATURES -->
+          <div>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="fw-bold text-white mb-0">
+                <i class="bi bi-people-fill text-cyan me-2"></i> Candidatures Reçues
+              </h5>
+              <span class="count-pill py-1 px-3" style="font-size: 0.75rem;">{{ applications.length }}</span>
+            </div>
+
+            <div *ngIf="loadingApps" class="text-center py-4">
+              <div class="spinner-border spinner-border-sm text-info" role="status"></div>
+            </div>
+
+            <div *ngIf="!loadingApps && applications.length === 0" class="empty-box p-4 text-center rounded-3">
+              <i class="bi bi-inbox text-subtle fs-3 mb-1 d-block"></i>
+              <div class="text-subtle small">Aucune candidature reçue pour le moment.</div>
+            </div>
+
+            <!-- Liste Candidatures -->
+            <div class="d-flex flex-column gap-3" *ngIf="!loadingApps && applications.length > 0">
+              <div *ngFor="let app of applications" class="applicant-card p-3 rounded-3 border">
+                
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <a [routerLink]="['/profile', getFreelanceId(app)]" class="d-flex align-items-center gap-2 text-decoration-none group-profile-link" title="Cliquer pour consulter le profil complet">
+                    <div class="avatar-holo-ring" style="width: 36px; height: 36px;">
+                      <div class="avatar-inner" style="font-size: 0.85rem;">
+                        {{ getFreelanceName(app).charAt(0) }}
+                      </div>
+                    </div>
+                    <div>
+                      <div class="fw-bold text-white small applicant-hover-name d-flex align-items-center gap-1">
+                        {{ getFreelanceName(app) }}
+                        <i class="bi bi-box-arrow-up-right text-info" style="font-size: 0.65rem;"></i>
+                      </div>
+                      <div class="d-flex align-items-center gap-1">
+                        <span class="badge-status-pill py-0 px-2" style="font-size: 0.65rem;"
+                              [class.status-open]="app.status === 'PENDING'"
+                              [class.status-progress]="app.status === 'ACCEPTED'"
+                              [class.status-closed]="app.status === 'REJECTED'">
+                          {{ app.status }}
+                        </span>
+                        <span class="badge bg-dark text-info border border-info border-opacity-25 py-0 px-1" style="font-size: 0.62rem;">
+                          <i class="bi bi-star-fill text-warning me-1"></i>Voir profil & avis
+                        </span>
+                      </div>
+                    </div>
+                  </a>
+
+                  <div class="d-flex align-items-center gap-2">
+                    <!-- Bouton Voir Profil -->
+                    <a [routerLink]="['/profile', getFreelanceId(app)]" class="btn btn-outline-info btn-sm py-1 px-2" style="font-size: 0.75rem;" title="Voir le profil du freelance">
+                      <i class="bi bi-person-badge-fill me-1"></i> Profil
+                    </a>
+                    <!-- Bouton Chat direct -->
+                    <a [routerLink]="['/chat', getFreelanceId(app)]" class="btn btn-outline-primary btn-sm py-1 px-2" style="font-size: 0.75rem;" title="Discuter en direct">
+                      <i class="bi bi-chat-dots-fill me-1"></i> Discuter
+                    </a>
+                  </div>
+                </div>
+
+                <!-- Lettre de motivation -->
+                <p class="text-subtle small mb-3 fst-italic" style="font-size: 0.82rem; line-height: 1.5;">
+                  "{{ app.message || app.coverLetter || 'Aucun message de motivation rédigé.' }}"
+                </p>
+
+                <!-- Actions Accepter / Refuser si PENDING -->
+                <div class="d-flex justify-content-end gap-2 pt-2 border-top" *ngIf="app.status === 'PENDING'">
+                  <button class="btn btn-outline-danger btn-sm px-3 py-1" style="font-size: 0.78rem;" (click)="rejectFreelance(app.id)">
+                    <i class="bi bi-x-circle me-1"></i> Refuser
+                  </button>
+                  <button class="btn btn-success btn-sm px-3 py-1 fw-bold text-white" style="font-size: 0.78rem;" (click)="acceptFreelance(app.id)">
+                    <i class="bi bi-check-circle me-1"></i> Retenir le Freelance
+                  </button>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ==================== MODALE 1 : VALIDATION, NOTATION AVEC ÉTOILES & DÉBLOCAGE ==================== -->
+<div *ngIf="showReviewModal" class="modal-backdrop fade show"></div>
+
+<div *ngIf="showReviewModal" class="modal d-block fade show" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content overflow-hidden">
+      
+      <div class="modal-header modal-header-gradient p-4 text-white">
+        <div>
+          <span class="badge-modal-tag mb-1"><i class="bi bi-star-fill me-1"></i> Évaluation de la Prestation</span>
+          <h5 class="modal-title fw-bold text-white mb-0">Valider la Mission & Débloquer le Séquestre</h5>
+        </div>
+        <button type="button" class="btn-close-custom" (click)="closeReviewModal()"><i class="bi bi-x-lg"></i></button>
+      </div>
+
+      <div class="modal-body p-4">
+        
+        <!-- COMPOSANT D'ÉTOILES INTERACTIVES -->
+        <label class="form-label text-light fw-bold small mb-2 d-block text-center">
+          Note de satisfaction attribuée au travail du freelance :
+        </label>
+        
+        <div class="interactive-stars-container mb-2">
+          <i *ngFor="let s of [1, 2, 3, 4, 5]"
+             class="bi star-interactive"
+             [class.bi-star-fill]="s <= (hoverRating || reviewRating)"
+             [class.bi-star]="s > (hoverRating || reviewRating)"
+             [class.star-active]="s <= (hoverRating || reviewRating)"
+             (mouseenter)="hoverRating = s"
+             (mouseleave)="hoverRating = 0"
+             (click)="setRating(s)"></i>
+        </div>
+
+        <div class="text-center mb-3">
+          <span class="rating-score-badge">{{ getRatingLabel() }}</span>
+        </div>
+
+        <!-- Décomposition financière avant déblocage -->
+        <div class="financial-pill-box p-3 mb-3 small">
+          <div class="d-flex justify-content-between mb-1">
+            <span class="text-subtle">Montant consigné sous séquestre :</span>
+            <strong class="text-white">{{ selectedProject?.budget | number }} €</strong>
+          </div>
+          <div class="d-flex justify-content-between mb-1">
+            <span class="text-subtle">Frais plateforme FreelanceHub (10%) :</span>
+            <span class="text-muted">{{ (selectedProject?.budget * 0.10) | number }} €</span>
+          </div>
+          <div class="d-flex justify-content-between pt-1 border-top border-white-10">
+            <span class="text-emerald fw-bold">Net débloqué et versé au freelance :</span>
+            <strong class="text-emerald fs-6">{{ (selectedProject?.budget * 0.90) | number }} €</strong>
+          </div>
+        </div>
+
+        <label class="form-label text-light fw-bold small mb-1">Votre avis / commentaire de clôture :</label>
+        <textarea class="form-control input-premium" rows="4" [(ngModel)]="reviewComment"
+                  placeholder="Qualité du code source, respect des délais, communication..."></textarea>
+      </div>
+
+      <div class="modal-footer p-3 d-flex justify-content-between">
+        <button type="button" class="btn btn-outline-secondary btn-sm" (click)="closeReviewModal()">Annuler</button>
+        <button type="button" class="btn-ai-glow btn-sm px-4" [disabled]="submittingReview || !reviewComment.trim()" (click)="submitReview()">
+          <span *ngIf="submittingReview" class="spinner-border spinner-border-sm me-1"></span>
+          {{ submittingReview ? 'Déblocage en cours...' : '⭐ Valider, Noter & Débloquer le Paiement' }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MODALE 2 : CONSIGNATION SÉQUESTRE (SAISIE COORDONNÉES BANCAIRES) ==================== -->
+<div *ngIf="showDepositModal" class="modal-backdrop fade show"></div>
+
+<div *ngIf="showDepositModal" class="modal d-block fade show" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content overflow-hidden">
+      
+      <div class="modal-header modal-header-gradient p-4 text-white">
+        <div>
+          <span class="badge-modal-tag mb-1"><i class="bi bi-shield-lock-fill me-1"></i> Tiers de Confiance Escrow</span>
+          <h5 class="modal-title fw-bold text-white mb-0">Consigner les Fonds sous Séquestre</h5>
+          <p class="text-subtle small mb-0 mt-1">Vos coordonnées bancaires permettent d'immobiliser les fonds jusqu'à la livraison du projet.</p>
+        </div>
+        <button type="button" class="btn-close-custom" (click)="closeDepositModal()"><i class="bi bi-x-lg"></i></button>
+      </div>
+
+      <div class="modal-body p-4">
+        
+        <div class="row g-4 mb-2">
+          
+          <!-- Colonne Gauche : Carte Holographique Interactive en Direct -->
+          <div class="col-lg-5">
+            <div class="credit-card-mockup mb-3">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="card-chip"></span>
+                  <i class="bi bi-wifi text-white-50 fs-5" style="transform: rotate(90deg);"></i>
+                </div>
+                <div class="d-flex align-items-center gap-1">
+                  <span class="badge-ai py-1 px-2" style="font-size: 0.65rem;">{{ cardBrand }}</span>
+                </div>
+              </div>
+
+              <div class="card-number-display mb-3 font-monospace">
+                {{ formattedDisplayCardNumber }}
+              </div>
+
+              <div class="d-flex justify-content-between align-items-end small text-white-50">
+                <div>
+                  <span class="d-block" style="font-size: 0.62rem; letter-spacing: 0.05em;">TITULAIRE</span>
+                  <span class="text-white fw-bold text-truncate d-inline-block" style="max-width: 140px;">
+                    {{ displayCardHolder }}
+                  </span>
+                </div>
+                <div class="text-end">
+                  <span class="d-block" style="font-size: 0.62rem; letter-spacing: 0.05em;">EXPIRE FIN</span>
+                  <span class="text-white fw-bold">{{ displayExpiry }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bouton rapide Démo / Test Card -->
+            <button type="button" class="btn btn-outline-info btn-sm w-100 py-2 d-flex align-items-center justify-content-center gap-2 mb-3" (click)="fillDemoCard()">
+              <i class="bi bi-lightning-charge-fill text-warning"></i>
+              <span>Remplir Carte Démo Test (Stripe)</span>
+            </button>
+
+            <!-- Récapitulatif Financier Transparent -->
+            <div class="financial-pill-box p-3 small rounded-3">
+              <div class="d-flex justify-content-between mb-1">
+                <span class="text-subtle">Freelance désigné :</span>
+                <span class="text-cyan fw-bold">{{ getAcceptedFreelanceName() }}</span>
+              </div>
+              <div class="d-flex justify-content-between mb-1">
+                <span class="text-subtle">Frais de protection Escrow :</span>
+                <span class="text-success fw-bold">Inclus (0 €)</span>
+              </div>
+              <div class="d-flex justify-content-between pt-2 mt-1 border-top border-white-10">
+                <span class="text-white fw-bold">Montant à consigner :</span>
+                <strong class="text-gradient fs-5">{{ selectedProject?.budget | number }} €</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Colonne Droite : Formulaire de Saisie des Coordonnées Bancaires -->
+          <div class="col-lg-7">
+            
+            <!-- Error Alert in Modal -->
+            <div class="alert alert-danger py-2 px-3 small border-0 rounded-3 mb-3 d-flex align-items-center" *ngIf="depositError">
+              <i class="bi bi-exclamation-triangle-fill me-2 fs-6"></i>
+              <span>{{ depositError }}</span>
+            </div>
+
+            <!-- Formulaire -->
+            <div class="payment-form-inputs">
+
+              <!-- Nom sur la carte -->
+              <div class="mb-3">
+                <label class="form-label text-light fw-bold small mb-1">
+                  Nom du titulaire de la carte <span class="text-danger">*</span>
+                </label>
+                <div class="input-with-icon">
+                  <i class="bi bi-person-badge-fill input-icon"></i>
+                  <input
+                    type="text"
+                    class="form-control input-premium ps-5"
+                    [(ngModel)]="depositCardHolder"
+                    name="depositCardHolder"
+                    placeholder="ex : Jean Dupont"
+                    autocomplete="cc-name"
+                    required>
+                </div>
+              </div>
+
+              <!-- Numéro de Carte Bancaire -->
+              <div class="mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <label class="form-label text-light fw-bold small mb-0">
+                    Numéro de carte bancaire <span class="text-danger">*</span>
+                  </label>
+                  <span class="text-cyan small fw-bold" style="font-size: 0.72rem;">
+                    <i class="bi bi-credit-card-2-front me-1"></i>{{ cardBrand }}
+                  </span>
+                </div>
+                <div class="input-with-icon position-relative">
+                  <i class="bi bi-credit-card-fill input-icon"></i>
+                  <input
+                    type="text"
+                    class="form-control input-premium ps-5 font-monospace"
+                    [ngModel]="depositCardNumber"
+                    (input)="onCardNumberInput($event)"
+                    name="depositCardNumber"
+                    maxlength="19"
+                    placeholder="4532 •••• •••• ••••"
+                    autocomplete="cc-number"
+                    required>
+                </div>
+              </div>
+
+              <!-- Expiration & Cryptogramme CVV -->
+              <div class="row g-2 mb-3">
+                
+                <div class="col-6">
+                  <label class="form-label text-light fw-bold small mb-1">
+                    Expiration (MM/AA) <span class="text-danger">*</span>
+                  </label>
+                  <div class="input-with-icon">
+                    <i class="bi bi-calendar-event input-icon"></i>
+                    <input
+                      type="text"
+                      class="form-control input-premium ps-5 font-monospace text-center"
+                      [ngModel]="depositExpiry"
+                      (input)="onExpiryInput($event)"
+                      name="depositExpiry"
+                      placeholder="MM/AA"
+                      maxlength="5"
+                      autocomplete="cc-exp"
+                      required>
+                  </div>
+                </div>
+
+                <div class="col-6">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <label class="form-label text-light fw-bold small mb-0">
+                      Code CVV / CVC <span class="text-danger">*</span>
+                    </label>
+                    <span class="text-muted small" style="font-size: 0.68rem;" title="3 chiffres au verso">
+                      <i class="bi bi-shield-check"></i> 3 chiffres
+                    </span>
+                  </div>
+                  <div class="input-with-icon">
+                    <i class="bi bi-shield-lock-fill input-icon"></i>
+                    <input
+                      type="password"
+                      class="form-control input-premium ps-5 font-monospace text-center"
+                      [ngModel]="depositCvv"
+                      (input)="onCvvInput($event)"
+                      name="depositCvv"
+                      placeholder="•••"
+                      maxlength="4"
+                      autocomplete="cc-csc"
+                      required>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- Notice de Sécurité Chiffrée -->
+              <div class="p-3 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-25 small mb-0">
+                <div class="d-flex align-items-start gap-2 text-subtle" style="font-size: 0.74rem; line-height: 1.4;">
+                  <i class="bi bi-shield-fill-check text-success fs-5 flex-shrink-0"></i>
+                  <span>
+                    <strong>Protocole Escrow Sécurisé :</strong> Les fonds de <strong>{{ selectedProject?.budget | number }} €</strong> sont prélevés et conservés sur un compte séquestre étanche. Le freelance n'est rémunéré <strong>qu'après votre accord et validation</strong> finale.
+                  </span>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="modal-footer p-3 d-flex justify-content-between">
+        <button type="button" class="btn btn-outline-secondary btn-sm" (click)="closeDepositModal()">Annuler</button>
+        <button
+          type="button"
+          class="btn-ai-glow btn-sm px-4"
+          [disabled]="depositingEscrow || !isDepositFormValid"
+          (click)="executeDeposit()">
+          <span *ngIf="depositingEscrow" class="spinner-border spinner-border-sm me-1"></span>
+          <i *ngIf="!depositingEscrow" class="bi bi-lock-fill me-1"></i>
+          {{ depositingEscrow ? 'Consignation en cours...' : '🔒 Consigner & Sécuriser ' + (selectedProject?.budget | number) + ' €' }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MODALE 3 : OUVERTURE DE LITIGE ==================== -->
+<div *ngIf="showDisputeModal" class="modal-backdrop fade show"></div>
+
+<div *ngIf="showDisputeModal" class="modal d-block fade show" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content overflow-hidden">
+      
+      <div class="modal-header bg-danger text-white p-4">
+        <div>
+          <span class="badge bg-white text-danger fw-bold mb-1"><i class="bi bi-shield-exclamation me-1"></i> Désaccord / Litige</span>
+          <h5 class="modal-title fw-bold text-white mb-0">Déclarer un Litige sur le Projet</h5>
+        </div>
+        <button type="button" class="btn-close-custom" (click)="closeDisputeModal()"><i class="bi bi-x-lg"></i></button>
+      </div>
+
+      <div class="modal-body p-4">
+        <p class="text-white small mb-3">
+          En déclarant un litige, les fonds de <strong>{{ selectedProject?.budget | number }} €</strong> resteront immédiatement gelés sous séquestre. L'équipe d'administration prendra contact avec les deux parties pour étudier les livrables et trancher.
+        </p>
+
+        <label class="form-label text-light fw-bold small mb-1">Motif détaillé du désaccord :</label>
+        <textarea class="form-control input-premium" rows="4" [(ngModel)]="disputeReason"
+                  placeholder="Précisez les fonctionnalités non livrées, les bugs majeurs constatés ou le non-respect du cahier des charges initial..."></textarea>
+      </div>
+
+      <div class="modal-footer p-3 d-flex justify-content-between">
+        <button type="button" class="btn btn-outline-secondary btn-sm" (click)="closeDisputeModal()">Annuler</button>
+        <button type="button" class="btn btn-danger btn-sm px-4" [disabled]="submittingDispute || !disputeReason.trim()" (click)="executeDispute()">
+          <span *ngIf="submittingDispute" class="spinner-border spinner-border-sm me-1"></span>
+          {{ submittingDispute ? 'Transmission...' : '⚠️ Ouvrir le Dossier de Litige' }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MODALE 4 : SUPPRESSION PROJET ==================== -->
+<div *ngIf="showDeleteModal" class="modal-backdrop fade show"></div>
+
+<div *ngIf="showDeleteModal" class="modal d-block fade show" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content overflow-hidden text-center p-4">
+      <div class="mb-3">
+        <i class="bi bi-trash3-fill text-danger display-5"></i>
+      </div>
+      <h5 class="fw-bold text-white mb-2">Supprimer ce projet ?</h5>
+      <p class="text-subtle small mb-4">Cette action est irréversible. Les candidatures associées seront archivées.</p>
+
+      <div class="d-flex justify-content-center gap-2">
+        <button type="button" class="btn btn-outline-secondary btn-sm px-3" (click)="cancelDelete()">Annuler</button>
+        <button type="button" class="btn btn-danger btn-sm px-3" [disabled]="deletingProject" (click)="executeDelete()">
+          <span *ngIf="deletingProject" class="spinner-border spinner-border-sm me-1"></span>
+          {{ deletingProject ? 'Suppression...' : 'Confirmer' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MODALE 5 : FACTURE & REÇU SÉQUESTRE (ESCROW INVOICE) ==================== -->
+<div *ngIf="showInvoiceModal" class="modal-backdrop fade show"></div>
+
+<div *ngIf="showInvoiceModal" class="modal d-block fade show" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content border-0 rounded-4 overflow-hidden shadow-2xl" style="background: #0B0F19; border: 1px solid var(--border-glass-bright) !important;">
+      
+      <!-- Invoice Header Bar -->
+      <div class="p-3 d-flex justify-content-between align-items-center border-bottom border-white-10" style="background: rgba(255, 255, 255, 0.03);">
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-receipt text-cyan fs-5"></i>
+          <span class="fw-bold text-white small">FREELANCEHUB ESCROW — REÇU & FACTURE DE SÉQUESTRE</span>
+        </div>
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-sm btn-outline-info" (click)="printInvoice()">
+            <i class="bi bi-printer me-1"></i> Imprimer / PDF
+          </button>
+          <button type="button" class="btn-close btn-close-white" (click)="closeInvoiceModal()"></button>
+        </div>
+      </div>
+
+      <!-- Printable Invoice Sheet -->
+      <div class="p-4 p-md-5" style="background: #0D1222; color: #E2E8F0;">
+        
+        <!-- Header -->
+        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start border-bottom border-secondary pb-4 mb-4 gap-3">
+          <div>
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <div class="d-flex align-items-center justify-content-center rounded-3 bg-gradient p-2" style="background: linear-gradient(135deg, #EC4899, #8B5CF6); width: 36px; height: 36px;">
+                <i class="bi bi-shield-check text-white fs-5"></i>
+              </div>
+              <h4 class="fw-extrabold text-white mb-0" style="font-family: 'Syne', sans-serif;">FreelanceHub <span class="text-gradient">AI</span></h4>
+            </div>
+            <p class="text-subtle small mb-0">Plateforme Tiers de Confiance & Séquestre Garanti</p>
+            <p class="text-subtle small mb-0">Service Bancaire Numérique Automatisé</p>
+          </div>
+          <div class="text-sm-end">
+            <span class="badge px-3 py-2 fs-6 rounded-pill" 
+                  [class.bg-success]="projectPayment?.status === 'RELEASED'"
+                  [class.bg-primary]="projectPayment?.status === 'HELD_IN_ESCROW'"
+                  [class.bg-warning]="projectPayment?.status === 'DISPUTED'">
+              {{ projectPayment?.status === 'RELEASED' ? '✓ FONDS REVERSÉS' : (projectPayment?.status === 'HELD_IN_ESCROW' ? '🔒 FONDS SOUS SÉQUESTRE' : '⚠️ EN LITIGE') }}
+            </span>
+            <div class="mt-2 text-subtle small font-monospace">Réf : {{ projectPayment?.transactionRef || ('ESC-PRJ-' + selectedProject?.id) }}</div>
+            <div class="text-subtle small">Date : {{ (projectPayment?.createdAt || selectedProject?.createdAt) | date:'dd/MM/yyyy HH:mm' }}</div>
+          </div>
+        </div>
+
+        <!-- Project & Parties Info -->
+        <div class="row g-4 mb-4 pb-3 border-bottom border-secondary">
+          <div class="col-md-6">
+            <h6 class="text-cyan text-uppercase fw-bold small mb-2">Donneur d'Ordre (Client)</h6>
+            <div class="fw-bold text-white fs-6">{{ selectedProject?.clientName || 'Client Donneur d\'Ordre' }}</div>
+            <div class="text-subtle small">Compte Vérifié • ID #{{ selectedProject?.clientId || 'CLT-2026' }}</div>
+          </div>
+          <div class="col-md-6 text-md-end">
+            <h6 class="text-violet text-uppercase fw-bold small mb-2">Bénéficiaire (Freelance)</h6>
+            <div class="fw-bold text-white fs-6">{{ projectPayment?.freelanceName || getAcceptedFreelanceName() || 'Prestataire Retenu' }}</div>
+            <div class="text-subtle small">Mission IT Sécurisée</div>
+          </div>
+        </div>
+
+        <!-- Mission Details -->
+        <div class="mb-4">
+          <h6 class="text-white fw-bold mb-3">Prestation Enregistrée</h6>
+          <div class="table-responsive">
+            <table class="table table-dark table-borderless align-middle mb-0" style="background: rgba(255,255,255,0.02); border-radius: 12px; overflow: hidden;">
+              <thead>
+                <tr class="text-subtle small border-bottom border-secondary">
+                  <th class="ps-3 py-2">Désignation</th>
+                  <th class="py-2 text-center">Garantie</th>
+                  <th class="pe-3 py-2 text-end">Montant Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="border-bottom border-white-10">
+                  <td class="ps-3 py-3">
+                    <strong class="text-white d-block">{{ selectedProject?.title }}</strong>
+                    <small class="text-subtle">Cahier des charges validé & séquestre activé</small>
+                  </td>
+                  <td class="py-3 text-center">
+                    <span class="badge bg-info-subtle text-cyan small">Escrow 100% Garanti</span>
+                  </td>
+                  <td class="pe-3 py-3 text-end fw-bold text-white">
+                    {{ (projectPayment?.amount || selectedProject?.budget) | number }} €
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Financial Summary Breakdown -->
+        <div class="row justify-content-end mb-4">
+          <div class="col-md-6">
+            <div class="p-3 rounded-3" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);">
+              <div class="d-flex justify-content-between mb-2 small">
+                <span class="text-subtle">Budget Total Mission :</span>
+                <span class="text-white fw-semibold">{{ (projectPayment?.amount || selectedProject?.budget) | number }} €</span>
+              </div>
+              <div class="d-flex justify-content-between mb-2 small">
+                <span class="text-subtle">Frais de Gestion Séquestre (10%) :</span>
+                <span class="text-subtle">{{ (projectPayment?.platformFee || ((selectedProject?.budget || 0) * 0.1)) | number }} €</span>
+              </div>
+              <div class="d-flex justify-content-between mb-2 small">
+                <span class="text-subtle">Rémunération Nette Freelance (90%) :</span>
+                <span class="text-emerald fw-semibold">{{ (projectPayment?.netAmount || ((selectedProject?.budget || 0) * 0.9)) | number }} €</span>
+              </div>
+              <div class="d-flex justify-content-between pt-2 border-top border-white-10">
+                <strong class="text-white">Total Sécurisé :</strong>
+                <strong class="text-cyan fs-5">{{ (projectPayment?.amount || selectedProject?.budget) | number }} €</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Guarantee Stamp & Footer -->
+        <div class="pt-3 border-top border-secondary d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-shield-lock-fill text-emerald fs-3"></i>
+            <div>
+              <div class="fw-bold text-white small">CERTIFICAT SÉQUESTRE OFFICIEL FREELANCEHUB AI</div>
+              <div class="text-subtle" style="font-size: 0.72rem;">Authentifié avec clé de signature sécurisée bancaire</div>
+            </div>
+          </div>
+          <div class="text-subtle small text-center text-md-end font-monospace">
+            TXN: {{ projectPayment?.transactionRef || 'FH-ESCROW-2026-VAL' }}
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer p-3 justify-content-end" style="background: rgba(255,255,255,0.02);">
+        <button type="button" class="btn btn-outline-secondary btn-sm px-4" (click)="closeInvoiceModal()">Fermer</button>
+        <button type="button" class="btn btn-primary btn-sm px-4" (click)="printInvoice()">
+          <i class="bi bi-printer me-1"></i> Imprimer / Enregistrer PDF
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>

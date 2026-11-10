@@ -1,0 +1,110 @@
+<div class="auth-page-container min-vh-100 d-flex align-items-center justify-content-center p-3 p-md-4">
+  
+  <div class="auth-box-wrapper w-100 fade-up" style="max-width: 480px;">
+    
+    <!-- Glassmorphic Card -->
+    <div class="premium-card p-4 p-sm-5 position-relative">
+      
+      <!-- Luminous Top Accent Bar -->
+      <div class="card-glow-bar"></div>
+
+      <!-- Header: 3D Hologram Logo & Typography -->
+      <div class="text-center mb-4">
+        <div class="d-inline-flex mb-3">
+          <div class="auth-logo-box">
+            <i class="bi bi-cpu-fill fs-2"></i>
+            <span class="auth-logo-glow"></span>
+          </div>
+        </div>
+
+        <h2 class="brand-font fw-extrabold text-white mb-1">
+          FreelanceHub<span class="text-gradient">.AI</span>
+        </h2>
+        <p class="text-subtle small mb-0">
+          Plateforme Intelligente de Collaboration & Missions IT
+        </p>
+      </div>
+
+      <!-- Alert Error -->
+      <div class="alert alert-danger border-0 rounded-3 small mb-3 d-flex align-items-center" *ngIf="error">
+        <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+        <span>{{ error }}</span>
+      </div>
+
+      <!-- Login Form -->
+      <form (ngSubmit)="onSubmit()">
+
+        <!-- Email Field -->
+        <div class="mb-3">
+          <label class="form-label text-light fw-bold small mb-1">Adresse Email</label>
+          <div class="input-with-icon">
+            <i class="bi bi-envelope-at input-icon"></i>
+            <input
+              type="email"
+              class="form-control input-premium ps-5"
+              [(ngModel)]="email"
+              name="email"
+              required
+              placeholder="ex: client@test.com">
+          </div>
+        </div>
+
+        <!-- Password Field -->
+        <div class="mb-3">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <label class="form-label text-light fw-bold small mb-0">Mot de passe</label>
+            <a routerLink="/forgot-password" class="text-cyan small text-decoration-none" style="font-size: 0.75rem;">
+              Mot de passe oublié ?
+            </a>
+          </div>
+          <div class="input-with-icon">
+            <i class="bi bi-shield-lock input-icon"></i>
+            <input
+              type="password"
+              class="form-control input-premium ps-5"
+              [(ngModel)]="password"
+              name="password"
+              required
+              placeholder="••••••••">
+          </div>
+        </div>
+
+        <!-- Remember Me Check -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div class="form-check">
+            <input class="form-check-input custom-checkbox" type="checkbox" id="rememberMe" checked>
+            <label class="form-check-label text-muted small" for="rememberMe">
+              Mémoriser la session
+            </label>
+          </div>
+          <span class="badge-ai py-1 px-2" style="font-size: 0.65rem;">JWT Auth</span>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn-ai-glow w-100 py-3" [disabled]="loading || !email || !password">
+          <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+          <span *ngIf="!loading">
+            Accéder à l'Espace <i class="bi bi-arrow-right ms-2"></i>
+          </span>
+          <span *ngIf="loading">Connexion Sécurisée...</span>
+        </button>
+      </form>
+
+      <!-- Register Link -->
+      <div class="text-center mt-4 pt-3 border-top">
+        <span class="text-muted small">Vous découvrez FreelanceHub ?</span>
+        <a routerLink="/register" class="text-gradient fw-bold text-decoration-none ms-1 small">
+          Créer un compte <i class="bi bi-chevron-right"></i>
+        </a>
+      </div>
+
+    </div>
+
+    <!-- Security Footnote -->
+    <div class="text-center mt-3 text-muted small" style="font-size: 0.75rem;">
+      <i class="bi bi-shield-check text-success me-1"></i> Écosystème chiffré & propulsé par Deep Learning
+    </div>
+
+  </div>
+
+</div>

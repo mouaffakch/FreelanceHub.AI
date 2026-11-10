@@ -1,0 +1,219 @@
+.avatar-holo-large {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  padding: 3px;
+  background: var(--gradient-brand);
+  box-shadow: 0 4px 25px rgba(99, 102, 241, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.avatar-large-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: var(--bg-surface);
+  color: #FFFFFF;
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 2.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rating-badge-glow {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  box-shadow: 0 2px 10px rgba(245, 158, 11, 0.2);
+}
+
+.projects-badge {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  box-shadow: 0 2px 10px rgba(16, 185, 129, 0.2);
+}
+
+/* ==================== KPI METRIC CARDS ==================== */
+.kpi-metric-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-glass-bright);
+  backdrop-filter: blur(12px);
+  border-radius: var(--radius-md);
+  transition: all 0.22s ease;
+  height: 100%;
+
+  &:hover {
+    transform: translateY(-3px);
+    border-color: rgba(99, 102, 241, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  }
+}
+
+.kpi-icon-box {
+  width: 46px;
+  height: 46px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-glass-bright);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  &.text-cyan { color: #22D3EE; border-color: rgba(6, 182, 212, 0.35); box-shadow: 0 0 12px rgba(6, 182, 212, 0.15); }
+  &.text-amber { color: #FBBF24; border-color: rgba(245, 158, 11, 0.35); box-shadow: 0 0 12px rgba(245, 158, 11, 0.15); }
+  &.text-violet { color: #818CF8; border-color: rgba(99, 102, 241, 0.35); box-shadow: 0 0 12px rgba(99, 102, 241, 0.15); }
+  &.text-emerald { color: #34D399; border-color: rgba(16, 185, 129, 0.35); box-shadow: 0 0 12px rgba(16, 185, 129, 0.15); }
+}
+
+.kpi-metric-num {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 1.85rem;
+  color: #FFFFFF;
+}
+
+.kpi-metric-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #E2E8F0;
+  letter-spacing: 0.02em;
+}
+
+.kpi-metric-sub {
+  font-size: 0.72rem;
+  color: var(--text-subtle);
+  display: block;
+  margin-top: 2px;
+}
+
+/* ==================== TECH SKILLS TAGS ==================== */
+.skill-tag-neon {
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  color: #C7D2FE;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(99, 102, 241, 0.18);
+    border-color: #6366F1;
+    transform: translateY(-2px);
+  }
+}
+
+/* ==================== PROJECT ITEMS ==================== */
+.project-item-card {
+  background: rgba(255, 255, 255, 0.025);
+  border-color: var(--border-glass) !important;
+  transition: all 0.22s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.045);
+    border-color: rgba(99, 102, 241, 0.35) !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  }
+}
+
+.budget-badge-glow {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.project-attached-review {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.07), rgba(99, 102, 241, 0.04));
+  border: 1px solid rgba(251, 191, 36, 0.25);
+}
+
+/* ==================== REVIEW SCORE HERO ==================== */
+.review-score-hero {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.05), rgba(99, 102, 241, 0.05));
+  border-color: rgba(245, 158, 11, 0.2) !important;
+}
+
+.score-big-block {
+  min-width: 140px;
+}
+
+.bio-display-box {
+  background: rgba(11, 15, 28, 0.7);
+  border: 1px solid var(--border-glass);
+  color: #E2E8F0;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  font-size: 0.95rem;
+}
+
+.empty-box {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px dashed var(--border-glass);
+}
+
+.enhanced-preview-box {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(99, 102, 241, 0.08) 100%);
+  border-color: rgba(16, 185, 129, 0.35) !important;
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.15);
+}
+
+.enhanced-text {
+  color: #F1F5F9;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.review-item-card {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: var(--border-glass) !important;
+  transition: all 0.22s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.18) !important;
+  }
+}
+
+.count-pill {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-glass-bright);
+  border-radius: var(--radius-pill);
+  color: #FFFFFF;
+  font-weight: 700;
+}
+
+.avatar-holo-ring {
+  border-radius: 50%;
+  padding: 2px;
+  background: var(--gradient-brand);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: var(--bg-surface);
+  color: #FFFFFF;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.font-monospace-custom {
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 0.9rem !important;
+  line-height: 1.6;
+}
+
+.text-subtle {
+  color: var(--text-subtle);
+}

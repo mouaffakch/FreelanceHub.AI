@@ -1,0 +1,89 @@
+.ai-generator-panel {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.08) 50%, rgba(6, 182, 212, 0.05) 100%) !important;
+  border: 1px solid rgba(99, 102, 241, 0.35) !important;
+  box-shadow: 0 4px 25px rgba(99, 102, 241, 0.15);
+}
+
+.ai-badge-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-xs);
+  background: var(--gradient-brand);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+}
+
+.quick-prompt-btn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-glass);
+  color: #E2E8F0;
+  border-radius: var(--radius-pill);
+  padding: 4px 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(99, 102, 241, 0.18);
+    border-color: #6366F1;
+    color: #FFFFFF;
+    transform: translateY(-1px);
+  }
+}
+
+.ai-success-toast {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+.currency-symbol {
+  position: absolute;
+  top: 50%;
+  left: 18px;
+  transform: translateY(-50%);
+  color: #22D3EE;
+  font-weight: 800;
+  font-size: 1.1rem;
+  pointer-events: none;
+}
+
+.skill-select-pill {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-glass-bright);
+  color: var(--text-subtle);
+  border-radius: var(--radius-pill);
+  padding: 6px 16px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.25);
+    color: #FFFFFF;
+  }
+
+  &.active-skill {
+    background: rgba(99, 102, 241, 0.2);
+    border-color: #6366F1;
+    color: #FFFFFF;
+    box-shadow: 0 2px 10px rgba(99, 102, 241, 0.3);
+  }
+}
+
+.font-monospace-custom {
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 0.9rem !important;
+  line-height: 1.6;
+}
+
+.text-subtle {
+  color: var(--text-subtle);
+}

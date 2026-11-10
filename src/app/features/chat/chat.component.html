@@ -1,0 +1,142 @@
+<app-navbar></app-navbar>
+
+<div class="container py-4 fade-up" style="max-width: 920px;">
+
+  <div class="chat-window premium-card overflow-hidden">
+
+    <!-- ===================== CHAT HEADER ===================== -->
+    <div class="chat-header p-3 p-md-4 border-bottom d-flex align-items-center justify-content-between">
+      <div class="d-flex align-items-center gap-3">
+        <button class="btn-back-chat" (click)="goBack()" title="Retour au cockpit">
+          <i class="bi bi-arrow-left"></i>
+        </button>
+
+        <div class="avatar-holo-ring" style="width: 44px; height: 44px;">
+          <div class="avatar-inner" style="font-size: 1rem;">
+            {{ getOtherInitial() }}
+          </div>
+        </div>
+
+        <div>
+          <h5 class="fw-bold text-white mb-0">{{ getOtherName() }}</h5>
+          <div class="d-flex align-items-center gap-2">
+            <span class="badge-role-pill" style="font-size: 0.65rem;"
+                  [class.role-client]="otherUser?.roleName?.includes('CLIENT')"
+                  [class.role-freelance]="otherUser?.roleName?.includes('FREELANCE')">
+              {{ getRoleLabel(otherUser?.roleName) }}
+            </span>
+            <span class="online-indicator-pill">
+              <span class="pulse-dot"></span> Discussion active
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-none d-md-flex align-items-center gap-2">
+        <span class="badge-ai py-1 px-3" style="font-size: 0.7rem;">
+          <i class="bi bi-shield-lock-fill me-1"></i> Canal Chiffré E2E
+        </span>
+      </div>
+    </div>
+
+    <!-- ===================== INFO NOTICE BAR ===================== -->
+    <div class="chat-notice-bar px-3 px-md-4 py-2 border-bottom">
+      <small class="text-subtle" style="font-size: 0.8rem;">
+        <i class="bi bi-info-circle text-cyan me-1"></i>
+        Espace collaboratif pour valider les jalons, les livrables, l'architecture et les modalités d'exécution.
+      </small>
+    </div>
+
+    <!-- ===================== MESSAGES BODY ===================== -->
+    <div #scrollMe class="chat-body p-3 p-md-4" style="height: 480px; overflow-y: auto;">
+
+      <!-- Loading -->
+      <div *ngIf="loading" class="text-center py-5">
+        <div class="spinner-border text-info spinner-border-sm me-2"></div>
+        <span class="text-subtle small">Synchronisation des messages...</span>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="!loading && messages.length === 0" class="text-center py-5 empty-chat-state">
+        <div class="mb-3">
+          <i class="bi bi-chat-quote-fill display-4 text-gradient"></i>
+        </div>
+        <h6 class="fw-bold text-white">Démarrer la Discussion</h6>
+        <p class="text-subtle small mb-0" style="max-width: 380px; margin: 0 auto;">
+          Présentez votre méthodologie, convenez d'un point d'alignement ou confirmez la réception des spécifications.
+        </p>
+
+        <!-- Quick Suggestions -->
+        <div class="d-flex flex-wrap justify-content-center gap-2 mt-4">
+          <button class="quick-prompt-btn"
+                  (click)="newMessage = 'Bonjour ! Ravi de collaborer avec vous. Pouvons-nous caler le planning du sprint initial ?'">
+            👋 Valider le planning
+          </button>
+          <button class="quick-prompt-btn"
+                  (click)="newMessage = 'Quels sont les accès ou dépôts Git nécessaires pour commencer le développement ?'">
+            📦 Demander les accès Git
+          </button>
+          <button class="quick-prompt-btn"
+                  (click)="newMessage = 'Voici les livrables de la première phase prêts pour relecture.'">
+            🚀 Point d'avancement livrables
+          </button>
+        </div>
+      </div>
+
+      <!-- Messages Stream -->
+      <div *ngFor="let msg of messages" class="mb-3 d-flex"
+           [class.justify-content-end]="isMine(msg)"
+           [class.justify-content-start]="!isMine(msg)">
+
+        <!-- Avatar pour les messages reçus -->
+        <div *ngIf="!isMine(msg)"
+             class="avatar-holo-ring me-2 flex-shrink-0"
+             style="width: 30px; height: 30px; margin-top: auto;">
+          <div class="avatar-inner" style="font-size: 0.72rem;">
+            {{ getOtherInitial() }}
+          </div>
+        </div>
+
+        <div class="message-bubble px-3 py-2"
+             [class.bubble-mine]="isMine(msg)"
+             [class.bubble-theirs]="!isMine(msg)">
+          <div class="message-content">{{ msg.content }}</div>
+          <div class="message-meta text-end mt-1">
+            <span class="msg-time">{{ msg.createdAt ? (msg.createdAt | date:'HH:mm') : 'maintenant' }}</span>
+            <i class="bi bi-check2-all ms-1 text-cyan" *ngIf="isMine(msg)"></i>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Error message if send failed -->
+    <div *ngIf="error" class="alert alert-danger border-0 rounded-0 small py-2 px-3 mb-0">
+      <i class="bi bi-exclamation-triangle-fill me-1"></i>{{ error }}
+    </div>
+
+    <!-- ===================== CHAT INPUT FOOTER ===================== -->
+    <div class="chat-footer p-3 border-top">
+      <div class="d-flex align-items-center gap-2">
+        <input 
+          type="text" 
+          class="form-control input-premium flex-grow-1" 
+          [(ngModel)]="newMessage" 
+          (keydown)="onKeyDown($event)"
+          placeholder="Écrivez un message en direct (Appuyez sur Entrée pour envoyer)...">
+
+        <button 
+          class="btn-ai-glow py-2 px-4" 
+          (click)="sendMessage()" 
+          [disabled]="sending || !newMessage.trim()">
+          <span *ngIf="sending" class="spinner-border spinner-border-sm"></span>
+          <i *ngIf="!sending" class="bi bi-send-fill"></i>
+          <span class="d-none d-sm-inline ms-1">{{ sending ? '...' : 'Envoyer' }}</span>
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+</div>
