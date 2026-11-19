@@ -124,10 +124,10 @@ export class AIService {
   }
 
   // ✨ Amélioration Profil
-  enhanceProfile(bio: string): Observable<AIResponse> {
+  enhanceProfile(bio: string, tone: string = 'IMPACT'): Observable<AIResponse> {
     return this.http.post<AIResponse>(
       `${this.apiUrl}/enhance-profile`,
-      { prompt: bio },
+      { prompt: bio, tone },
       { headers: this.getHeaders() }
     );
   }

@@ -219,30 +219,83 @@
           <div class="d-flex justify-content-between align-items-center mb-1 flex-wrap gap-1">
             <label class="form-label text-light fw-bold small mb-0">Description Bio</label>
             <span class="text-subtle small d-flex align-items-center gap-1" style="font-size: 0.75rem;">
-              <i class="bi bi-cpu text-cyan"></i> Agent IA Prêt & Adaptatif
+              <i class="bi" [class.bi-patch-check-fill]="hasLlmKey()" [class.text-success]="hasLlmKey()" [class.bi-cpu]="!hasLlmKey()" [class.text-cyan]="!hasLlmKey()"></i>
+              {{ hasLlmKey() ? 'Agent LLM Direct Connecté' : 'Agent IA Génératif Adaptatif' }}
             </span>
           </div>
           <textarea class="form-control input-premium font-monospace-custom" rows="6" [(ngModel)]="editBio"
                     placeholder="Présentez votre expertise, vos compétences clés et votre valeur ajoutée..."></textarea>
         </div>
 
+        <!-- AI Agent Tone & Generator Selector Bar -->
+        <div class="ai-copilot-toolbar p-3 rounded-4 mb-3" style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(99, 102, 241, 0.25);">
+          <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+            <div class="d-flex align-items-center gap-2">
+              <span class="badge-ai"><i class="bi bi-robot"></i> Copilot IA</span>
+              <span class="text-subtle small">Choisissez l'angle de rédaction :</span>
+            </div>
+            <span class="badge" [class.bg-success]="hasLlmKey()" [class.bg-primary]="!hasLlmKey()" style="font-size: 0.7rem;">
+              {{ hasLlmKey() ? 'Mode LLM Direct' : 'Mode Dynamique (sans clé)' }}
+            </span>
+          </div>
+
+          <div class="d-flex flex-wrap gap-2">
+            <button type="button" class="btn btn-sm"
+                    [class.btn-primary]="selectedTone === 'IMPACT'"
+                    [class.btn-outline-secondary]="selectedTone !== 'IMPACT'"
+                    (click)="enhanceBio('IMPACT')" [disabled]="enhancing">
+              ⚡ Impact Commercial
+            </button>
+            <button type="button" class="btn btn-sm"
+                    [class.btn-primary]="selectedTone === 'ARCHITECT'"
+                    [class.btn-outline-secondary]="selectedTone !== 'ARCHITECT'"
+                    (click)="enhanceBio('ARCHITECT')" [disabled]="enhancing">
+              🏛️ Architecte Senior
+            </button>
+            <button type="button" class="btn btn-sm"
+                    [class.btn-primary]="selectedTone === 'STORYTELLING'"
+                    [class.btn-outline-secondary]="selectedTone !== 'STORYTELLING'"
+                    (click)="enhanceBio('STORYTELLING')" [disabled]="enhancing">
+              📖 Storytelling
+            </button>
+            <button type="button" class="btn btn-sm"
+                    [class.btn-primary]="selectedTone === 'CONCISE'"
+                    [class.btn-outline-secondary]="selectedTone !== 'CONCISE'"
+                    (click)="enhanceBio('CONCISE')" [disabled]="enhancing">
+              🎯 Concis (Pitch)
+            </button>
+          </div>
+        </div>
+
         <!-- AI Preview Box if generated -->
         <div *ngIf="showEnhancedPreview" class="enhanced-preview-box p-3 rounded-4 mb-3 border">
-          <div class="d-flex justify-content-between align-items-center mb-2">
-            <span class="badge-ai"><i class="bi bi-stars"></i> Proposition Rédigée par l'IA</span>
-            <button class="btn btn-sm btn-success text-white fw-bold py-1 px-3" (click)="applyEnhancedBio()">
-              <i class="bi bi-check2 me-1"></i> Adopter cette version
-            </button>
+          <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+            <div class="d-flex align-items-center gap-2">
+              <span class="badge-ai"><i class="bi bi-stars"></i> {{ getToneLabel() }}</span>
+              <span class="badge bg-secondary small" *ngIf="variantIndex > 0">Variante #{{ variantIndex }}</span>
+            </div>
+            <div class="d-flex gap-2">
+              <button class="btn btn-sm btn-outline-info py-1 px-2 d-inline-flex align-items-center gap-1"
+                      (click)="regenerateBio()" [disabled]="enhancing">
+                <i class="bi bi-arrow-repeat" [class.spinner-border-sm]="enhancing"></i>
+                <span>{{ enhancing ? 'Génération...' : 'Autre variante' }}</span>
+              </button>
+              <button class="btn btn-sm btn-success text-white fw-bold py-1 px-3 d-inline-flex align-items-center gap-1"
+                      (click)="applyEnhancedBio()">
+                <i class="bi bi-check2"></i>
+                <span>Adopter cette version</span>
+              </button>
+            </div>
           </div>
           <p class="enhanced-text mb-0 small">{{ enhancedBio }}</p>
         </div>
 
         <!-- Actions -->
         <div class="d-flex flex-wrap gap-2 pt-2">
-          <button class="btn-ai-glow btn-sm" (click)="enhanceBio()" [disabled]="enhancing">
+          <button class="btn-ai-glow btn-sm" (click)="enhanceBio(selectedTone)" [disabled]="enhancing">
             <span *ngIf="enhancing" class="spinner-border spinner-border-sm me-1"></span>
             <i *ngIf="!enhancing" class="bi bi-stars me-1"></i>
-            {{ enhancing ? 'Optimisation en cours...' : 'Améliorer avec l\'IA' }}
+            {{ enhancing ? 'Génération par l\'IA...' : 'Générer avec l\'Agent IA' }}
           </button>
 
           <button class="btn btn-outline-primary btn-sm px-4 ms-auto" (click)="saveProfile()" [disabled]="saving">

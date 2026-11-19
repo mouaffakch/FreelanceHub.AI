@@ -50,6 +50,8 @@ export class ProfileComponent implements OnInit {
   enhancing = false;
   enhancedBio = '';
   showEnhancedPreview = false;
+  selectedTone = 'IMPACT';
+  variantIndex = 0;
 
   get completedCount(): number {
     if (!this.completedProjects || this.completedProjects.length === 0) return 0;
@@ -205,14 +207,33 @@ export class ProfileComponent implements OnInit {
     });
   }
 
-  // 🤖 IA : Améliorer la bio
-  enhanceBio(): void {
+  hasLlmKey(): boolean {
+    return !!this.aiService.getApiKey();
+  }
+
+  getToneLabel(tone: string = this.selectedTone): string {
+    switch (tone) {
+      case 'ARCHITECT': return 'Architecte & Senior';
+      case 'STORYTELLING': return 'Storytelling & Passion';
+      case 'CONCISE': return 'Concis & Elevator Pitch';
+      case 'IMPACT':
+      default: return 'Impact Commercial';
+    }
+  }
+
+  // 🤖 IA : Améliorer la bio avec styles adaptatifs & variantes
+  enhanceBio(tone?: string): void {
     if (!this.editBio?.trim()) {
-      this.error = 'Veuillez écrire quelque chose dans votre bio avant de l\'améliorer.';
+      this.error = 'Veuillez écrire quelques mots sur vous dans la bio avant de lancer l\'Agent IA.';
       return;
     }
+    if (tone) {
+      this.selectedTone = tone;
+    }
     this.enhancing = true;
-    this.aiService.enhanceProfile(this.editBio).subscribe({
+    this.error = '';
+    this.variantIndex++;
+    this.aiService.enhanceProfile(this.editBio, this.selectedTone).subscribe({
       next: (res: AIResponse) => {
         this.enhancedBio = res.generatedText;
         this.showEnhancedPreview = true;
@@ -220,9 +241,13 @@ export class ProfileComponent implements OnInit {
       },
       error: () => {
         this.enhancing = false;
-        this.error = 'Erreur lors de l\'amélioration IA.';
+        this.error = 'Erreur lors de la génération avec l\'Agent IA.';
       }
     });
+  }
+
+  regenerateBio(): void {
+    this.enhanceBio(this.selectedTone);
   }
 
   applyEnhancedBio(): void {
