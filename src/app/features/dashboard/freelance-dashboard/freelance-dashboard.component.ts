@@ -182,7 +182,7 @@ export class FreelanceDashboardComponent implements OnInit {
           this.selectedAppForDeliver.deliverablesNotes = updatedProj.deliverablesNotes;
           this.selectedAppForDeliver.deliveredAt = updatedProj.deliveredAt;
         }
-        this.successMsg = '🚀 Livrables transmis avec succès au client pour vérification et déblocage des fonds !';
+        this.successMsg = 'Livrables transmis avec succès au client pour vérification et déblocage des fonds !';
         this.loadMyApplications();
         setTimeout(() => (this.successMsg = ''), 5000);
       },

@@ -83,8 +83,19 @@
   }
 }
 
-.role-emoji {
-  font-size: 1.4rem;
+.role-icon-box {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-xs);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-glass-bright);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.05rem;
+
+  &.text-cyan { color: #22D3EE; border-color: rgba(6, 182, 212, 0.3); }
+  &.text-violet { color: #818CF8; border-color: rgba(99, 102, 241, 0.3); }
 }
 
 .role-desc {

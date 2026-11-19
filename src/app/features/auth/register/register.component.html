@@ -105,7 +105,9 @@
                           [class.active-role]="roleName === 'CLIENT'"
                           (click)="roleName = 'CLIENT'">
                     <div class="d-flex align-items-center justify-content-between mb-1">
-                      <span class="role-emoji">🏢</span>
+                      <div class="role-icon-box text-violet">
+                        <i class="bi bi-briefcase-fill"></i>
+                      </div>
                       <i class="bi bi-check-circle-fill text-magenta" *ngIf="roleName === 'CLIENT'"></i>
                     </div>
                     <div class="fw-bold text-white small">Porteur de Projet</div>
@@ -119,7 +121,9 @@
                           [class.active-role]="roleName === 'FREELANCE'"
                           (click)="roleName = 'FREELANCE'">
                     <div class="d-flex align-items-center justify-content-between mb-1">
-                      <span class="role-emoji">💻</span>
+                      <div class="role-icon-box text-cyan">
+                        <i class="bi bi-laptop-fill"></i>
+                      </div>
                       <i class="bi bi-check-circle-fill text-cyan" *ngIf="roleName === 'FREELANCE'"></i>
                     </div>
                     <div class="fw-bold text-white small">Freelance Tech</div>

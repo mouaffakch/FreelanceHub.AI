@@ -81,10 +81,10 @@
       <div class="col-md-3">
         <label class="form-label text-light fw-bold small mb-1">Plateforme cible</label>
         <select class="form-select input-premium" [(ngModel)]="smartPlatform">
-          <option value="Web">🌐 Web (Angular / React)</option>
-          <option value="Mobile">📱 Mobile (Flutter / React Native)</option>
-          <option value="Fullstack">⚡ Fullstack SaaS (Spring / Node)</option>
-          <option value="Data">🤖 Data & IA / Machine Learning</option>
+          <option value="Web">Web (Angular / React)</option>
+          <option value="Mobile">Mobile (Flutter / React Native)</option>
+          <option value="Fullstack">Fullstack SaaS (Spring / Node)</option>
+          <option value="Data">Data & IA / Machine Learning</option>
         </select>
       </div>
     </div>
@@ -94,15 +94,15 @@
       <small class="text-muted fw-bold">Suggestions à tester :</small>
       <button class="quick-prompt-btn" 
               (click)="smartIdea = 'Plateforme SaaS de gestion des congés et notes de frais avec dashboard analytics'; smartPlatform='Web'">
-        🏢 SaaS RH & Analytics
+        <i class="bi bi-building me-1"></i> SaaS RH & Analytics
       </button>
       <button class="quick-prompt-btn" 
               (click)="smartIdea = 'App mobile de téléconsultation médicale avec visio et ordonnances sécurisées'; smartPlatform='Mobile'">
-        🩺 Téléconsultation Médicale
+        <i class="bi bi-heart-pulse me-1"></i> Téléconsultation Médicale
       </button>
       <button class="quick-prompt-btn" 
               (click)="smartIdea = 'Moteur de détection de fraudes bancaires par Machine Learning en temps réel'; smartPlatform='Data'">
-        🤖 IA Détection de Fraude
+        <i class="bi bi-shield-lock me-1"></i> IA Détection de Fraude
       </button>
     </div>
 
@@ -125,10 +125,10 @@
         </div>
         <div class="d-flex flex-wrap gap-2 align-items-center">
           <span class="count-pill py-1 px-3 text-emerald">
-            💰 {{ smartResult.estimatedBudget | number }} €
+            <i class="bi bi-cash-stack me-1"></i>{{ smartResult.estimatedBudget | number }} €
           </span>
           <span class="count-pill py-1 px-3 text-cyan">
-            📅 {{ smartResult.suggestedDurationDays }} jours
+            <i class="bi bi-calendar-event me-1"></i>{{ smartResult.suggestedDurationDays }} jours
           </span>
           <button class="btn btn-outline-primary btn-sm px-3" (click)="copyToClipboard(smartResult.fullDescription)">
             <i class="bi" [class.bi-clipboard]="!copied" [class.bi-check2]="copied"></i>
@@ -330,7 +330,7 @@
                   [class.high-match]="rec.matchScore >= 70"
                   [class.mid-match]="rec.matchScore < 70"
                   style="font-size: 0.88rem;">
-              ✨ {{ rec.matchScore }}% de Compatibilité
+              <i class="bi bi-stars me-1"></i>{{ rec.matchScore }}% de Compatibilité
             </span>
           </div>
         </div>
@@ -339,10 +339,10 @@
 
         <div class="d-flex flex-wrap gap-1 mb-3">
           <span class="matched-skill-tag" *ngFor="let s of rec.matchedSkills">
-            ✓ {{ s }}
+            <i class="bi bi-check2 me-1"></i>{{ s }}
           </span>
           <span class="badge bg-danger-subtle text-danger rounded-pill px-2 py-1 small" *ngFor="let s of rec.missingSkills">
-            ✗ {{ s }} (Manquant)
+            <i class="bi bi-x me-1"></i>{{ s }} (Manquant)
           </span>
         </div>
 

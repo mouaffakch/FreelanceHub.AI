@@ -58,9 +58,9 @@
         <div class="d-flex align-items-center gap-2">
           <span class="text-subtle small fw-bold text-nowrap">Trier par :</span>
           <select class="form-select input-premium py-2" [(ngModel)]="sortBy">
-            <option value="recent">⚡ Plus Récents</option>
-            <option value="budget_desc">💰 Budget Décroissant (€)</option>
-            <option value="budget_asc">📈 Budget Croissant (€)</option>
+            <option value="recent">Plus Récents</option>
+            <option value="budget_desc">Budget Décroissant (€)</option>
+            <option value="budget_asc">Budget Croissant (€)</option>
           </select>
         </div>
       </div>
@@ -224,8 +224,8 @@
               [disabled]="generatingProposal"
               (click)="generateAiProposal()">
               <span *ngIf="generatingProposal" class="spinner-border spinner-border-sm me-1"></span>
-              <i *ngIf="!generatingProposal" class="bi bi-magic me-1"></i>
-              {{ generatingProposal ? 'Génération en cours...' : '✨ Générer ma proposition sur-mesure' }}
+              <i *ngIf="!generatingProposal" class="bi bi-stars me-1"></i>
+              {{ generatingProposal ? 'Génération en cours...' : 'Générer ma proposition sur-mesure' }}
             </button>
           </div>
           <p class="text-subtle small mb-0" style="font-size: 0.8rem;">
@@ -257,7 +257,8 @@
           [disabled]="submittingApplication || !coverLetter.trim()"
           (click)="submitApplication()">
           <span *ngIf="submittingApplication" class="spinner-border spinner-border-sm me-2"></span>
-          {{ submittingApplication ? 'Transmission...' : '🚀 Envoyer ma Candidature' }}
+          <i *ngIf="!submittingApplication" class="bi bi-send-fill me-2"></i>
+          {{ submittingApplication ? 'Transmission...' : 'Envoyer ma Candidature' }}
         </button>
       </div>
 

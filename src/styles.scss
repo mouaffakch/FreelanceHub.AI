@@ -1,20 +1,50 @@
 /* ==========================================================================
-   FREELANCEHUB AI — MODERN HIGH-END ENTERPRISE DESIGN SYSTEM
-   Refined Dark Palette • Glassmorphism • Micro-interactions • Linear/Vercel Aesthetic
+   FREELANCEHUB AI — MASTER DESIGN SYSTEM (UI/UX PRO MAX SPECIFICATION)
+   Gold Trust (#F59E0B) • Indigo/Violet Tech (#6366F1 / #8B5CF6) • Dark Slate Canvas (#0F172A)
+   Accessibility Compliant • Motion Reduced • Clean Micro-interactions
    ========================================================================== */
 
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Orbitron:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@700;800&display=swap');
+
 :root {
+  /* UI/UX Pro Max Official Tokens */
+  --color-primary: #F59E0B;
+  --color-on-primary: #0F172A;
+  --color-secondary: #FBBF24;
+  --color-on-secondary: #0F172A;
+  --color-accent: #8B5CF6;
+  --color-on-accent: #FFFFFF;
+  --color-background: #0F172A;
+  --color-foreground: #F8FAFC;
+  --color-card: #182032;
+  --color-card-foreground: #F8FAFC;
+  --color-muted: #272F42;
+  --color-muted-foreground: #94A3B8;
+  --color-border: #334155;
+  --color-destructive: #EF4444;
+  --color-on-destructive: #FFFFFF;
+  --color-ring: #F59E0B;
+
+  /* Spacing Scale (Density 7/10) */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+
   /* Surfaces & Backgrounds */
   --bg-void: #06080F;
   --bg-canvas: #090D16;
   --bg-surface: #0E1424;
-  --bg-card: rgba(15, 21, 38, 0.88);
-  --bg-card-hover: rgba(22, 30, 54, 0.95);
+  --bg-card: rgba(18, 25, 45, 0.90);
+  --bg-card-hover: rgba(26, 36, 62, 0.96);
   --bg-glass-input: rgba(12, 17, 32, 0.85);
-  --bg-glass-nav: rgba(9, 13, 23, 0.85);
+  --bg-glass-nav: rgba(9, 13, 23, 0.88);
   --bg-subtle: rgba(255, 255, 255, 0.03);
 
-  /* Primary Brand Gradients & Accents (Sophisticated Indigo / Violet / Cyan) */
+  /* Primary Brand Gradients & Accents (Indigo / Violet / Gold / Cyan) */
   --accent-primary: #6366F1;       /* Electric Indigo */
   --accent-primary-hover: #4F46E5;
   --accent-secondary: #8B5CF6;     /* Modern Violet */
@@ -24,7 +54,7 @@
   --accent-emerald: #10B981;       /* Verified / Financial Green */
   --accent-amber: #F59E0B;         /* Star / Alert Warm Amber */
 
-  /* Pure & Subtle Text Hierarchy */
+  /* Pure & Subtle Text Hierarchy (WCAG 4.5:1 Compliant) */
   --text-pure: #FFFFFF;
   --text-light: #F1F5F9;
   --text-subtle: #94A3B8;
@@ -40,14 +70,17 @@
 
   /* Signature Luxury Gradients */
   --gradient-brand: linear-gradient(135deg, #6366F1 0%, #8B5CF6 50%, #EC4899 100%);
+  --gradient-gold: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%);
   --gradient-cyan-indigo: linear-gradient(135deg, #06B6D4 0%, #6366F1 100%);
   --gradient-emerald-teal: linear-gradient(135deg, #10B981 0%, #06B6D4 100%);
   --gradient-amber-rose: linear-gradient(135deg, #F59E0B 0%, #F43F5E 100%);
-  --gradient-glass-card: linear-gradient(165deg, rgba(20, 27, 49, 0.85) 0%, rgba(13, 18, 34, 0.9) 100%);
+  --gradient-glass-card: linear-gradient(165deg, rgba(22, 31, 56, 0.88) 0%, rgba(14, 20, 38, 0.92) 100%);
 
   /* Multi-layered Soft Drop Shadows */
   --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.2);
   --shadow-md: 0 4px 14px -1px rgba(0, 0, 0, 0.4), 0 2px 6px -1px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 10px 25px -3px rgba(0, 0, 0, 0.5), 0 4px 10px -2px rgba(0, 0, 0, 0.3);
+  --shadow-xl: 0 20px 35px -5px rgba(0, 0, 0, 0.6), 0 10px 15px -5px rgba(0, 0, 0, 0.4);
   --shadow-card: 0 10px 30px -5px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
   --shadow-card-hover: 0 20px 40px -10px rgba(0, 0, 0, 0.7), 0 0 25px rgba(99, 102, 241, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.15);
   --shadow-glow-primary: 0 0 25px rgba(99, 102, 241, 0.35);
@@ -59,6 +92,64 @@
   --radius-lg: 18px;
   --radius-xl: 24px;
   --radius-pill: 9999px;
+}
+
+/* ==========================================================================
+   ACCESSIBILITY & INTERACTION PRESETS (UI/UX PRO MAX COMPLIANT)
+   ========================================================================== */
+
+/* 1. Visible Accessible Focus Rings */
+:focus-visible {
+  outline: 2px solid var(--color-ring, #F59E0B) !important;
+  outline-offset: 2px !important;
+}
+
+/* 2. Pointer Cursor on All Clickable & Interactive Elements */
+button,
+[role="button"],
+a,
+select,
+input[type="submit"],
+input[type="button"],
+input[type="checkbox"],
+input[type="radio"],
+.btn,
+.clickable,
+.nav-link,
+.nav-pill-link,
+.tab-pill-btn,
+.filter-chip,
+.quick-prompt-btn,
+.card-interactive,
+.page-link,
+.badge-interactive,
+.status-pill-toggle {
+  cursor: pointer !important;
+}
+
+/* 3. Smooth Transitions without Layout Shifts */
+button,
+a,
+.card,
+.premium-card,
+.form-control,
+.form-select,
+.badge,
+.tab-pill-btn,
+.filter-chip {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* 4. Respect User Reduced-Motion Preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* ==========================================================================

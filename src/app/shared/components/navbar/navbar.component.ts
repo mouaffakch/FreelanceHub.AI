@@ -14,9 +14,9 @@ export class NavbarComponent {
   showNotifications = false;
 
   notifications = [
-    { id: 1, title: '🔒 Fonds sous Séquestre', text: 'Garantie Escrow active sur votre mission.', time: 'Il y a 10 min', icon: 'bi-shield-check', type: 'success', read: false },
-    { id: 2, title: '💬 Nouveau Message', text: 'Une nouvelle communication est arrivée sur le chat.', time: 'Il y a 35 min', icon: 'bi-chat-dots-fill', type: 'info', read: false },
-    { id: 3, title: '⭐ Avis & Évaluation 5★', text: 'Nouvelle note certifiée enregistrée avec succès.', time: 'Il y a 2h', icon: 'bi-star-fill', type: 'warning', read: true }
+    { id: 1, title: 'Fonds sous Séquestre', text: 'Garantie Escrow active sur votre mission.', time: 'Il y a 10 min', icon: 'bi-shield-check', type: 'success', read: false },
+    { id: 2, title: 'Nouveau Message', text: 'Une nouvelle communication est arrivée sur le chat.', time: 'Il y a 35 min', icon: 'bi-chat-dots-fill', type: 'info', read: false },
+    { id: 3, title: 'Avis & Évaluation 5 Étoiles', text: 'Nouvelle note certifiée enregistrée avec succès.', time: 'Il y a 2h', icon: 'bi-star-fill', type: 'warning', read: true }
   ];
 
   constructor(public auth: AuthService) {}

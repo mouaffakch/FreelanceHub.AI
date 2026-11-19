@@ -92,7 +92,7 @@
               <span class="match-score-pill"
                     [class.high-match]="rec.matchScore >= 70"
                     [class.mid-match]="rec.matchScore < 70">
-                ✨ {{ rec.matchScore }}% Match
+                <i class="bi bi-stars me-1"></i>{{ rec.matchScore }}% Match
               </span>
               <small class="text-subtle"><i class="bi bi-building me-1"></i>{{ rec.clientName }}</small>
             </div>
@@ -101,7 +101,7 @@
             
             <div class="d-flex flex-wrap gap-1 mb-3">
               <span *ngFor="let s of rec.matchedSkills" class="matched-skill-tag">
-                ✓ {{ s }}
+                <i class="bi bi-check2 me-1"></i>{{ s }}
               </span>
             </div>
           </div>
@@ -315,7 +315,8 @@
         <button type="button" class="btn btn-outline-secondary btn-sm px-3" (click)="closeDeliverModal()">Annuler</button>
         <button type="button" class="btn-ai-glow btn-sm px-4" [disabled]="delivering || !deliverUrl.trim()" (click)="executeDeliver()">
           <span *ngIf="delivering" class="spinner-border spinner-border-sm me-1"></span>
-          {{ delivering ? 'Transmission en cours...' : '🚀 Transmettre au Client' }}
+          <i *ngIf="!delivering" class="bi bi-send-fill me-1"></i>
+          {{ delivering ? 'Transmission en cours...' : 'Transmettre au Client' }}
         </button>
       </div>
 
@@ -364,7 +365,7 @@
                   [class.bg-success]="getPaymentForProject(selectedInvoiceApp?.projectId || selectedInvoiceApp?.project?.id)?.status === 'RELEASED'"
                   [class.bg-primary]="getPaymentForProject(selectedInvoiceApp?.projectId || selectedInvoiceApp?.project?.id)?.status === 'HELD_IN_ESCROW'"
                   [class.bg-warning]="getPaymentForProject(selectedInvoiceApp?.projectId || selectedInvoiceApp?.project?.id)?.status === 'DISPUTED'">
-              {{ getPaymentForProject(selectedInvoiceApp?.projectId || selectedInvoiceApp?.project?.id)?.status === 'RELEASED' ? '✓ REVENUS DÉBLOQUÉS' : '🔒 EN SÉQUESTRE' }}
+              {{ getPaymentForProject(selectedInvoiceApp?.projectId || selectedInvoiceApp?.project?.id)?.status === 'RELEASED' ? 'REVENUS DÉBLOQUÉS' : 'EN SÉQUESTRE' }}
             </span>
             <div class="mt-2 text-subtle small font-monospace">
               Réf : {{ getPaymentForProject(selectedInvoiceApp?.projectId || selectedInvoiceApp?.project?.id)?.transactionRef || ('ESC-APP-' + selectedInvoiceApp?.id) }}

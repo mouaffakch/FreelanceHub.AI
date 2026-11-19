@@ -255,7 +255,7 @@ export class ClientDashboardComponent implements OnInit {
 
     this.applicationService.accept(appId).subscribe({
       next: () => {
-        this.successMsg = '🎉 Candidature acceptée avec succès ! Le projet passe au statut EN COURS.';
+        this.successMsg = 'Candidature acceptée avec succès ! Le projet passe au statut EN COURS.';
         this.loadProjects();
         setTimeout(() => (this.successMsg = ''), 4000);
       },
@@ -346,7 +346,7 @@ export class ClientDashboardComponent implements OnInit {
         this.depositingEscrow = false;
         this.showDepositModal = false;
         this.projectPayment = payment;
-        this.successMsg = '🔒 Montant de ' + (this.selectedProject?.budget || 0) + ' € consigné sous séquestre avec succès ! Vos données ont été validées et le projet est sécurisé.';
+        this.successMsg = 'Montant de ' + (this.selectedProject?.budget || 0) + ' € consigné sous séquestre avec succès ! Vos données ont été validées et le projet est sécurisé.';
         this.loadProjects();
         setTimeout(() => (this.successMsg = ''), 5000);
       },
@@ -395,14 +395,14 @@ export class ClientDashboardComponent implements OnInit {
             this.submittingReview = false;
             this.showReviewModal = false;
             this.projectPayment = payment;
-            this.successMsg = '🌟 Mission validée avec succès ! Les fonds ont été débloqués pour le freelance et votre avis est enregistré.';
+            this.successMsg = 'Mission validée avec succès ! Les fonds ont été débloqués pour le freelance et votre avis est enregistré.';
             this.loadProjects();
             setTimeout(() => (this.successMsg = ''), 5000);
           },
           error: () => {
             this.submittingReview = false;
             this.showReviewModal = false;
-            this.successMsg = '🌟 Avis enregistré avec succès !';
+            this.successMsg = 'Avis enregistré avec succès !';
             this.loadProjects();
             setTimeout(() => (this.successMsg = ''), 5000);
           }
@@ -439,7 +439,7 @@ export class ClientDashboardComponent implements OnInit {
         this.submittingDispute = false;
         this.showDisputeModal = false;
         this.projectPayment = payment;
-        this.successMsg = '⚠️ Litige ouvert. Les fonds sont gelés sous séquestre pour examen par l\'administrateur.';
+        this.successMsg = 'Litige ouvert. Les fonds sont gelés sous séquestre pour examen par l\'administrateur.';
         this.loadProjects();
         setTimeout(() => (this.successMsg = ''), 5000);
       },

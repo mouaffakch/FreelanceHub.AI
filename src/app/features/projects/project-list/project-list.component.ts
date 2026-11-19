@@ -165,7 +165,7 @@ export class ProjectListComponent implements OnInit {
         this.appliedProjectIds.add(this.targetProject.id);
         const title = this.targetProject.title;
         this.closeApplyModal();
-        this.successMsg = `🎉 Candidature envoyée avec succès pour "${title}" !`;
+        this.successMsg = `Candidature envoyée avec succès pour "${title}" !`;
         setTimeout(() => (this.successMsg = ''), 4500);
       },
       error: (err: any) => {

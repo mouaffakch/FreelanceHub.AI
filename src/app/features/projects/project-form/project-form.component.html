@@ -59,15 +59,15 @@
       <small class="text-muted fw-bold">Idées rapides :</small>
       <button type="button" class="quick-prompt-btn" 
               (click)="aiPrompt = 'Plateforme SaaS B2B de gestion des congés avec dashboard Angular et Spring Boot'">
-        🏢 SaaS RH Angular/Spring
+        <i class="bi bi-building me-1"></i> SaaS RH Angular/Spring
       </button>
       <button type="button" class="quick-prompt-btn" 
               (click)="aiPrompt = 'Application mobile de commerce connecté Flutter avec catalogue hors-ligne et paiements Stripe'">
-        📱 App Mobile Flutter E-Commerce
+        <i class="bi bi-phone me-1"></i> App Mobile Flutter E-Commerce
       </button>
       <button type="button" class="quick-prompt-btn" 
               (click)="aiPrompt = 'Pipeline ETL de détection de fraudes bancaires en temps réel avec Python et Docker'">
-        🤖 Pipeline Data & Machine Learning
+        <i class="bi bi-cpu me-1"></i> Pipeline Data & Machine Learning
       </button>
     </div>
 
@@ -178,9 +178,9 @@
     <div class="mb-4" *ngIf="isEdit">
       <label class="form-label fw-bold text-light small mb-1">Statut du Projet</label>
       <select class="form-select input-premium" [(ngModel)]="status" name="status">
-        <option value="OPEN">🟢 OPEN (Ouvert aux candidatures)</option>
-        <option value="IN_PROGRESS">🟡 IN_PROGRESS (Mission en cours)</option>
-        <option value="CLOSED">⚪ CLOSED (Projet clôturé)</option>
+        <option value="OPEN">OPEN (Ouvert aux candidatures)</option>
+        <option value="IN_PROGRESS">IN_PROGRESS (Mission en cours)</option>
+        <option value="CLOSED">CLOSED (Projet clôturé)</option>
       </select>
     </div>
 
@@ -192,8 +192,8 @@
 
       <button type="submit" class="btn-ai-glow px-5 py-3 order-1 order-sm-2" [disabled]="loading || !title.trim() || !description.trim()">
         <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
-        <i *ngIf="!loading" class="bi bi-check2-circle me-2"></i>
-        {{ loading ? 'Enregistrement...' : (isEdit ? 'Mettre à jour la Mission' : '🚀 Publier la Mission IT') }}
+        <i *ngIf="!loading" class="bi bi-send-fill me-2"></i>
+        {{ loading ? 'Enregistrement...' : (isEdit ? 'Mettre à jour la Mission' : 'Publier la Mission IT') }}
       </button>
     </div>
 

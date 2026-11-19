@@ -152,8 +152,8 @@ export class AdminDashboardComponent implements OnInit {
         this.showResolveModal = false;
         this.selectedDisputePayment = null;
         this.successMsg = action === 'REFUND_CLIENT'
-          ? '🛡️ Décision arbitrale validée : Le client a été intégralement remboursé.'
-          : '🛡️ Décision arbitrale validée : Les fonds ont été débloqués pour le freelance.';
+          ? 'Décision arbitrale validée : Le client a été intégralement remboursé.'
+          : 'Décision arbitrale validée : Les fonds ont été débloqués pour le freelance.';
         this.loadPayments();
         this.loadStats();
         setTimeout(() => (this.successMsg = ''), 5000);
