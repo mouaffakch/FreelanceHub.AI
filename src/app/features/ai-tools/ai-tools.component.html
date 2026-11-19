@@ -22,6 +22,91 @@
     </p>
   </div>
 
+  <!-- ==================== AI ENGINE STATUS & LIVE LLM BANNER ==================== -->
+  <div class="ai-engine-banner p-3 p-md-4 rounded-4 mb-4 border d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+    <div class="d-flex align-items-center gap-3">
+      <div class="engine-badge-icon" [class.engine-active]="hasActiveKey">
+        <i class="bi" [class.bi-lightning-charge-fill]="hasActiveKey" [class.bi-cpu]="!hasActiveKey"></i>
+      </div>
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+          <span class="badge" [class.bg-success-subtle]="hasActiveKey" [class.text-success]="hasActiveKey" [class.bg-info-subtle]="!hasActiveKey" [class.text-info]="!hasActiveKey">
+            <i class="bi" [class.bi-cloud-check-fill]="hasActiveKey" [class.bi-cpu-fill]="!hasActiveKey"></i>
+            {{ hasActiveKey ? ('LLM CONNECTÉ (' + aiProvider.toUpperCase() + ')') : 'MODE AGENT CONTEXTUEL ACTIF' }}
+          </span>
+          <span class="text-subtle small font-monospace" *ngIf="hasActiveKey">Gemini / Groq / OpenAI</span>
+        </div>
+        <p class="text-subtle small mb-0">
+          {{ hasActiveKey 
+             ? 'Vos générations sont alimentées en direct par le modèle d\'intelligence artificielle connecté.' 
+             : 'L\'agent local intelligent analyse le contexte métier, vos phrases et votre niveau pour générer des résultats uniques.' }}
+        </p>
+      </div>
+    </div>
+    <button type="button" class="btn btn-sm btn-outline-primary px-3 text-nowrap" (click)="toggleAiConfig()">
+      <i class="bi bi-gear-fill me-1"></i> {{ showAiConfig ? 'Masquer' : 'Configurer Clé LLM' }}
+    </button>
+  </div>
+
+  <!-- Collapsible AI Config Card -->
+  <div *ngIf="showAiConfig" class="ai-config-card p-4 rounded-4 mb-4 border fade-up">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h6 class="fw-bold text-white mb-0">
+        <i class="bi bi-sliders text-cyan me-1"></i> Paramètres du Moteur d'Agent IA
+      </h6>
+      <span class="badge bg-dark text-muted font-monospace small">BYOK (Bring Your Own Key)</span>
+    </div>
+
+    <div class="row g-3 mb-3">
+      <div class="col-md-5">
+        <label class="form-label text-light fw-bold small mb-1">Fournisseur LLM</label>
+        <select class="form-select input-premium" [(ngModel)]="aiProvider">
+          <option value="gemini">Google Gemini (1.5 Flash - 100% Gratuit)</option>
+          <option value="groq">Groq (Llama 3.3 70B - Vitesse Extrême)</option>
+          <option value="openai">OpenAI (GPT-4o-mini)</option>
+        </select>
+      </div>
+      <div class="col-md-7">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+          <label class="form-label text-light fw-bold small mb-0">Clé API</label>
+          <a *ngIf="aiProvider === 'gemini'" href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" class="text-gradient small fw-bold text-decoration-none">
+            Obtenir une clé Gemini gratuite →
+          </a>
+          <a *ngIf="aiProvider === 'groq'" href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer" class="text-gradient small fw-bold text-decoration-none">
+            Obtenir une clé Groq gratuite →
+          </a>
+        </div>
+        <input type="password" class="form-control input-premium font-monospace"
+               [(ngModel)]="aiApiKey"
+               placeholder="Ex: AIzaSy... ou gsk_..." />
+      </div>
+    </div>
+
+    <!-- Alert test message -->
+    <div *ngIf="aiTestMessage" class="alert small mb-3 p-3 rounded-3"
+         [class.alert-success]="aiTestSuccess === true"
+         [class.alert-danger]="aiTestSuccess === false">
+      <i class="bi" [class.bi-check-circle-fill]="aiTestSuccess === true" [class.bi-exclamation-triangle-fill]="aiTestSuccess === false"></i>
+      <span class="ms-2">{{ aiTestMessage }}</span>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <button type="button" class="btn btn-outline-danger btn-sm" (click)="clearAiConfig()" *ngIf="hasActiveKey">
+        Déconnecter la clé
+      </button>
+      <div class="ms-auto d-flex gap-2">
+        <button type="button" class="btn btn-outline-secondary btn-sm" (click)="toggleAiConfig()">
+          Fermer
+        </button>
+        <button type="button" class="btn-ai-glow btn-sm px-4" [disabled]="aiTesting" (click)="saveAiConfig()">
+          <span *ngIf="aiTesting" class="spinner-border spinner-border-sm me-1"></span>
+          <i *ngIf="!aiTesting" class="bi bi-shield-check me-1"></i>
+          {{ aiTesting ? 'Vérification...' : 'Tester & Sauvegarder' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Messages Flash -->
   <div *ngIf="error" class="alert alert-danger border-0 rounded-4 shadow-sm mb-4 d-flex align-items-center">
     <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>

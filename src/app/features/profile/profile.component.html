@@ -216,9 +216,11 @@
         </div>
 
         <div class="mb-3">
-          <div class="d-flex justify-content-between align-items-center mb-1">
+          <div class="d-flex justify-content-between align-items-center mb-1 flex-wrap gap-1">
             <label class="form-label text-light fw-bold small mb-0">Description Bio</label>
-            <span class="text-subtle small" style="font-size: 0.75rem;">Optimisable par IA</span>
+            <span class="text-subtle small d-flex align-items-center gap-1" style="font-size: 0.75rem;">
+              <i class="bi bi-cpu text-cyan"></i> Agent IA Prêt & Adaptatif
+            </span>
           </div>
           <textarea class="form-control input-premium font-monospace-custom" rows="6" [(ngModel)]="editBio"
                     placeholder="Présentez votre expertise, vos compétences clés et votre valeur ajoutée..."></textarea>

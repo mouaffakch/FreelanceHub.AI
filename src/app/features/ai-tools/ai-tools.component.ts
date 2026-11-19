@@ -49,6 +49,14 @@ export class AIToolsComponent implements OnInit {
   recommendations: RecommendationResponse[] = [];
   recoLoading = false;
 
+  // AI Engine Settings State
+  showAiConfig = false;
+  aiProvider = 'gemini';
+  aiApiKey = '';
+  aiTesting = false;
+  aiTestSuccess: boolean | null = null;
+  aiTestMessage = '';
+
   error = '';
   copied = false;
 
@@ -56,11 +64,69 @@ export class AIToolsComponent implements OnInit {
     return this.authService.getRole()?.includes('FREELANCE') || false;
   }
 
+  get hasActiveKey(): boolean {
+    return !!this.aiApiKey && this.aiApiKey.trim().length > 0;
+  }
+
   ngOnInit(): void {
+    this.aiProvider = this.aiService.getProvider() || 'gemini';
+    this.aiApiKey = this.aiService.getApiKey();
     this.loadProjectsList();
     if (this.isFreelance) {
       this.loadRecommendations();
     }
+  }
+
+  toggleAiConfig(): void {
+    this.showAiConfig = !this.showAiConfig;
+    if (this.showAiConfig) {
+      this.aiProvider = this.aiService.getProvider() || 'gemini';
+      this.aiApiKey = this.aiService.getApiKey();
+      this.aiTestMessage = '';
+      this.aiTestSuccess = null;
+    }
+  }
+
+  saveAiConfig(): void {
+    this.aiTesting = true;
+    this.aiTestMessage = '';
+    this.aiTestSuccess = null;
+
+    if (!this.aiApiKey.trim()) {
+      this.aiService.setApiKey('');
+      this.aiService.setProvider(this.aiProvider);
+      this.aiTesting = false;
+      this.aiTestSuccess = true;
+      this.aiTestMessage = 'Mode Agent Sémantique Local actif (aucun crédit requis).';
+      return;
+    }
+
+    this.aiService.testConnection(this.aiApiKey.trim(), this.aiProvider).subscribe({
+      next: (res) => {
+        this.aiTesting = false;
+        if (res.connected) {
+          this.aiService.setApiKey(this.aiApiKey.trim());
+          this.aiService.setProvider(this.aiProvider);
+          this.aiTestSuccess = true;
+          this.aiTestMessage = `Connexion établie avec succès avec ${res.provider} (Latence : ${res.latencyMs || 0} ms) ! L'Agent IA distant est maintenant actif.`;
+        } else {
+          this.aiTestSuccess = false;
+          this.aiTestMessage = res.message || 'Échec de validation de la clé API.';
+        }
+      },
+      error: (err) => {
+        this.aiTesting = false;
+        this.aiTestSuccess = false;
+        this.aiTestMessage = err?.error?.message || 'Erreur lors du test de connexion.';
+      }
+    });
+  }
+
+  clearAiConfig(): void {
+    this.aiApiKey = '';
+    this.aiService.setApiKey('');
+    this.aiTestSuccess = null;
+    this.aiTestMessage = 'Clé supprimée. Retour au mode Agent Sémantique Local.';
   }
 
   loadProjectsList(): void {

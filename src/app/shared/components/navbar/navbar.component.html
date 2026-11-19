@@ -54,6 +54,15 @@
         <!-- Right Side: User Profile & Actions -->
         <div class="d-flex align-items-center gap-2 gap-md-3 ms-auto mt-3 mt-lg-0" *ngIf="auth.isLoggedIn(); else guestNav">
           
+          <!-- AI Agent Status Pill -->
+          <button type="button" class="btn-ai-status-pill d-flex align-items-center gap-2" (click)="openAiModal()" title="Paramètres du Moteur IA">
+            <span class="status-indicator-dot" [class.active-llm]="hasActiveKey"></span>
+            <span class="ai-label d-none d-sm-inline">Agent IA</span>
+            <span class="badge-provider-tag" [class.badge-llm]="hasActiveKey">
+              {{ hasActiveKey ? aiProvider.toUpperCase() : 'LOCAL' }}
+            </span>
+          </button>
+
           <!-- Notification Bell -->
           <div class="position-relative">
             <button class="btn-notification-bell" type="button" (click)="toggleNotifications()" title="Notifications">
@@ -124,4 +133,121 @@
       </div>
     </div>
   </nav>
+
+  <!-- ==================== MODAL DE CONFIGURATION AGENT IA ==================== -->
+  <div *ngIf="showAiModal" class="modal-backdrop fade show"></div>
+
+  <div *ngIf="showAiModal" class="modal d-block fade show" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 rounded-4 shadow-2xl overflow-hidden" style="background: #0B1020; border: 1px solid var(--border-glass-bright) !important;">
+        
+        <!-- Modal Header -->
+        <div class="modal-header border-bottom border-white-10 p-3 p-md-4" style="background: rgba(99, 102, 241, 0.08);">
+          <div class="d-flex align-items-center gap-2">
+            <div class="p-2 rounded-3 bg-gradient d-flex align-items-center justify-content-center" style="background: var(--gradient-brand); width: 34px; height: 34px;">
+              <i class="bi bi-cpu text-white fs-6"></i>
+            </div>
+            <div>
+              <h5 class="modal-title fw-bold text-white mb-0 fs-6">Moteur & Modèle d'Agent IA</h5>
+              <small class="text-subtle" style="font-size: 0.75rem;">Connectez un LLM en direct ou profitez de l'agent sémantique</small>
+            </div>
+          </div>
+          <button type="button" class="btn-close btn-close-white" (click)="closeAiModal()"></button>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="modal-body p-4">
+          
+          <!-- Fournisseur IA -->
+          <div class="mb-3">
+            <label class="form-label text-light fw-bold small mb-2">Fournisseur de Modèle (LLM)</label>
+            <div class="d-flex flex-column gap-2">
+              
+              <label class="provider-option-card p-3 rounded-3 border d-flex align-items-center justify-content-between"
+                     [class.active-provider]="aiProvider === 'gemini'">
+                <div class="d-flex align-items-center gap-3">
+                  <input type="radio" name="aiProvider" value="gemini" [(ngModel)]="aiProvider" class="form-check-input mt-0">
+                  <div>
+                    <div class="fw-bold text-white small">Google Gemini (1.5 Flash / 2.0)</div>
+                    <div class="text-subtle" style="font-size: 0.72rem;">Recommandé • 100% Gratuit (15 req/min) • Google AI Studio</div>
+                  </div>
+                </div>
+                <span class="badge bg-success-subtle text-success small">Gratuit</span>
+              </label>
+
+              <label class="provider-option-card p-3 rounded-3 border d-flex align-items-center justify-content-between"
+                     [class.active-provider]="aiProvider === 'groq'">
+                <div class="d-flex align-items-center gap-3">
+                  <input type="radio" name="aiProvider" value="groq" [(ngModel)]="aiProvider" class="form-check-input mt-0">
+                  <div>
+                    <div class="fw-bold text-white small">Groq (Llama 3.3 70B Versatile)</div>
+                    <div class="text-subtle" style="font-size: 0.72rem;">Vitesse Extrême • 100% Gratuit • Console Groq</div>
+                  </div>
+                </div>
+                <span class="badge bg-info-subtle text-info small">Ultra-Fast</span>
+              </label>
+
+              <label class="provider-option-card p-3 rounded-3 border d-flex align-items-center justify-content-between"
+                     [class.active-provider]="aiProvider === 'openai'">
+                <div class="d-flex align-items-center gap-3">
+                  <input type="radio" name="aiProvider" value="openai" [(ngModel)]="aiProvider" class="form-check-input mt-0">
+                  <div>
+                    <div class="fw-bold text-white small">OpenAI (GPT-4o-mini)</div>
+                    <div class="text-subtle" style="font-size: 0.72rem;">Standard de l'industrie • Clé OpenAI requise</div>
+                  </div>
+                </div>
+                <span class="badge bg-primary-subtle text-primary small">OpenAI</span>
+              </label>
+
+            </div>
+          </div>
+
+          <!-- Clé API -->
+          <div class="mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <label class="form-label text-light fw-bold small mb-0">Votre Clé API</label>
+              <a *ngIf="aiProvider === 'gemini'" href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" class="text-gradient small fw-bold text-decoration-none" style="font-size: 0.72rem;">
+                Obtenir une clé Gemini gratuite →
+              </a>
+              <a *ngIf="aiProvider === 'groq'" href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer" class="text-gradient small fw-bold text-decoration-none" style="font-size: 0.72rem;">
+                Obtenir une clé Groq gratuite →
+              </a>
+            </div>
+            <input type="password" class="form-control input-premium font-monospace"
+                   [(ngModel)]="aiApiKey"
+                   placeholder="Ex: AIzaSy... ou gsk_..." />
+            <small class="text-subtle mt-1 d-block" style="font-size: 0.72rem;">
+              La clé est stockée uniquement dans votre navigateur et utilisée pour alimenter en direct les générations de FreelanceHub AI.
+            </small>
+          </div>
+
+          <!-- Feedback Alert -->
+          <div *ngIf="aiTestMessage" class="alert small mb-0 p-3 rounded-3"
+               [class.alert-success]="aiTestSuccess === true"
+               [class.alert-danger]="aiTestSuccess === false">
+            <i class="bi" [class.bi-check-circle-fill]="aiTestSuccess === true" [class.bi-exclamation-triangle-fill]="aiTestSuccess === false"></i>
+            <span class="ms-2">{{ aiTestMessage }}</span>
+          </div>
+
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="modal-footer border-top border-white-10 p-3 d-flex justify-content-between">
+          <button type="button" class="btn btn-outline-danger btn-sm" (click)="clearAiKey()" *ngIf="hasActiveKey">
+            Déconnecter la clé
+          </button>
+          <button type="button" class="btn btn-outline-secondary btn-sm" (click)="closeAiModal()" *ngIf="!hasActiveKey">
+            Fermer
+          </button>
+
+          <button type="button" class="btn-ai-glow btn-sm px-4" [disabled]="aiTesting" (click)="testAndSaveAiKey()">
+            <span *ngIf="aiTesting" class="spinner-border spinner-border-sm me-1"></span>
+            <i *ngIf="!aiTesting" class="bi bi-shield-check me-1"></i>
+            {{ aiTesting ? 'Test en cours...' : 'Tester & Activer' }}
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
 </div>

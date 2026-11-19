@@ -331,3 +331,73 @@
     transform: translateY(0);
   }
 }
+
+
+/* ==========================================================================
+   AI AGENT STATUS PILL & CONFIG MODAL
+   ========================================================================== */
+.btn-ai-status-pill {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-glass-bright);
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  color: #FFFFFF;
+  font-size: 0.8rem;
+  font-weight: 700;
+  transition: all 0.2s ease;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(99, 102, 241, 0.14);
+    border-color: rgba(99, 102, 241, 0.4);
+    transform: translateY(-1px);
+  }
+}
+
+.status-indicator-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #94A3B8;
+  display: inline-block;
+
+  &.active-llm {
+    background: #10B981;
+    box-shadow: 0 0 8px #10B981;
+    animation: modernPulse 2s infinite ease-in-out;
+  }
+}
+
+.badge-provider-tag {
+  font-size: 0.65rem;
+  padding: 2px 7px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-subtle);
+  letter-spacing: 0.03em;
+  font-family: 'JetBrains Mono', monospace;
+
+  &.badge-llm {
+    background: rgba(16, 185, 129, 0.16);
+    color: #34D399;
+    border: 1px solid rgba(16, 185, 129, 0.35);
+  }
+}
+
+.provider-option-card {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: var(--border-glass) !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.15) !important;
+  }
+
+  &.active-provider {
+    background: rgba(99, 102, 241, 0.12);
+    border-color: #6366F1 !important;
+    box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
+  }
+}
